@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="wled"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+<bridge-type id="mqttBroker">
+<label>mqttBroker</label>
+<description>ADD THIS FIRST: After adding this Openhab2 can then auto find and use your WLED strings after you edit and give your MQTT broker details.</description>
+
+<config-description>
+
+<parameter-group name="Main Settings">
+<label>Main Settings</label>
+<advanced>false</advanced>
+</parameter-group>
+
+<parameter-group name="Globe Settings">
+<label>Global Globe Settings</label>
+<advanced>false</advanced>
+</parameter-group>
+
+<parameter name="ADDR" type="text" required="true" groupName="Main Settings">
+<label>MQTT broker address</label>
+<description>It is best to use localhost if the broker is located on the same computer as Openhab. Otherwise use this format tcp://192.168.1.2:1883
+</description>
+<default>tcp://localhost:1883</default>
+</parameter>
+
+<parameter name="MQTT_USERNAME" type="text" required="false" groupName="Main Settings">
+<label>User name for MQTT broker.</label>
+<description>Enter the User name used to connect to your MQTT broker, or leave blank if none is needed to connect.
+</description>
+</parameter>
+
+<parameter name="MQTT_PASSWORD" type="text" required="false" groupName="Main Settings">
+<context>password</context>
+<label>Password for MQTT Broker.</label>
+<description>Enter Password for your MQTT Broker, or leave blank if none is needed to connect.
+</description>
+</parameter>
+
+<parameter name="DELAY_BETWEEN_MQTT" type="integer" required="true" min="5" max="1000" groupName="Main Settings">
+<label>Delay in milliseconds between all outgoing MQTT messages.</label>
+<description>Use this to prevent messages building up in the esp8266 buffers if the hub can not transmit to the globes fast enough.
+</description>
+<default>140</default>
+</parameter>
+
+<parameter name="DELAY_BETWEEN_SAME_GLOBE" type="integer" required="true" min="5" max="1000" groupName="Main Settings">
+<label>Delay in milliseconds between multiple outgoing MQTT messages heading to the same globe in a row.</label>
+<description>This feature will create less messages per second to the same globe when dragging a finger around a color item.
+</description>
+<default>250</default>
+</parameter>
+
+</config-description>
+</bridge-type>
+
+    <thing-type id="wled">
+        <supported-bridge-type-refs>
+            <bridge-type-ref id="mqttBroker" />
+        </supported-bridge-type-refs>
+        <label>WLed String</label>
+        <description>A Wled based string of LEDs</description>
+        <category>Lightbulb</category> 
+        <channels>
+            <channel id="colour" typeId="colour"/>
+            <channel id="presets" typeId="presets"/>
+            <channel id="presetDuration" typeId="presetDuration"/>
+            <channel id="presetTransformTime" typeId="presetTransformTime"/>
+            <channel id="presetCycle" typeId="presetCycle"/>
+            <channel id="palettes" typeId="palettes"/>
+            <channel id="fx" typeId="fx"/>
+            <channel id="speed" typeId="speed"/>
+            <channel id="intensity" typeId="intensity"/>
+            <channel id="sleep" typeId="sleep"/>
+            
+            
+        </channels>
+    </thing-type>
+    
+<channel-type id="colour">
+<item-type>Color</item-type>
+<label>Color</label>
+<description>Allows you to change the color of the globe.</description>
+<category>ColorLight</category>
+<tags>
+<tag>Lighting</tag>
+</tags>
+</channel-type>
+
+<channel-type id="palettes">
+<item-type>Number</item-type>
+<label>palettes</label>
+<description>Change the colours used by the FX.</description>
+<state>
+<options>
+
+<option value="0">Default</option>
+<option value="1">Random Cycle</option>
+<option value="2">Primary color</option>
+<option value="3">Based on primary</option>
+<option value="4">Set colors</option>
+<option value="5">Based on set</option>
+<option value="6">Party</option>
+<option value="7">Cloud</option>
+<option value="8">Lava</option>
+<option value="9">Ocean</option>
+<option value="10">Forest</option>
+<option value="11">Rainbow</option>
+<option value="12">Rainbow bands</option>
+<option value="13">Sunset</option>
+<option value="14">Rivendell</option>
+<option value="15">Breeze</option>
+<option value="16">RedAndBlue</option>
+<option value="17">Yellowout</option>
+<option value="18">Analoguous</option>
+<option value="19">Splash</option>
+<option value="20">Pastel</option>
+<option value="21">Sunset 2</option>
+<option value="22">Beech</option>
+<option value="23">Vintage</option>
+<option value="24">Departure</option>
+<option value="25">Landscape</option>
+<option value="26">Beach</option>
+<option value="27">Sherbet</option>
+<option value="28">Hult</option>
+<option value="29">Hult 64</option>
+<option value="30">Drywet</option>
+<option value="31">Jul</option>
+<option value="32">Grintage</option>
+<option value="33">Rewhi</option>
+<option value="34">Tertiary</option>
+<option value="35">Fire</option>
+<option value="36">Icefire</option>
+<option value="37">Cyane</option>
+<option value="38">Light Pink</option>
+<option value="39">Autumn</option>
+<option value="40">Magenta</option>
+<option value="41">Magred</option>
+<option value="42">Yelmag</option>
+<option value="43">Yelblu</option>
+<option value="44">OrangeAndTeal</option>
+<option value="45">Tiamat</option>
+<option value="46">April Night</option>
+<option value="47">Orangery</option>
+<option value="48">C9</option>
+<option value="49">Sakura</option>
+
+</options>
+</state>
+</channel-type>
+
+<channel-type id="fx">
+<item-type>Number</item-type>
+<label>Effect Index</label>
+<description>Use the built in FX.</description>
+<state>
+<options>
+<option value="0">Solid</option>
+<option value="1">Blink</option>
+<option value="2">Breathe</option>
+<option value="3">Wipe</option>
+<option value="4">Wipe_Random</option>
+<option value="5">Random_Colors</option>
+<option value="6">Sweep</option>
+<option value="7">Dynamic</option>
+<option value="8">Colorloop</option>
+<option value="9">Rainbow</option>
+<option value="10">Scan</option>
+<option value="11">Dual_Scan</option>
+<option value="12">Fade</option>
+<option value="13">Chase</option>
+<option value="14">Chase_Rainbow</option>
+<option value="15">Running</option>
+<option value="16">Saw</option>
+<option value="17">Twinkle</option>
+<option value="18">Dissolve</option>
+<option value="19">Dissolve_Rnd</option>
+<option value="20">Sparkle</option>
+<option value="21">Dark_Sparkle</option>
+<option value="22">Sparkle+</option>
+<option value="23">Strobe</option>
+<option value="24">Strobe_Rainbow</option>
+<option value="25">Mega_Strobe</option>
+<option value="26">Blink_Rainbow</option>
+<option value="27">Android</option>
+<option value="28">Chase</option>
+<option value="29">Chase_Random</option>
+<option value="30">Chase_Rainbow</option>
+<option value="31">Chase_Flash</option>
+<option value="32">Chase_Flash_Rnd</option>
+<option value="33">Rainbow_Runner</option>
+<option value="34">Colorful</option>
+<option value="35">Traffic_Light</option>
+<option value="36">Sweep_Random</option>
+<option value="37">Running_2</option>
+<option value="38">Red_and_Blue</option>
+<option value="39">Stream</option>
+<option value="40">Scanner</option>
+<option value="41">Lighthouse</option>
+<option value="42">Fireworks</option>
+<option value="43">Rain</option>
+<option value="44">Merry_Christmas</option>
+<option value="45">Fire_Flicker</option>
+<option value="46">Gradient</option>
+<option value="47">Loading</option>
+<option value="48">In_Out</option>
+<option value="49">In_In</option>
+<option value="50">Out_Out</option>
+<option value="51">Out_In</option>
+<option value="52">Circus</option>
+<option value="53">Halloween</option>
+<option value="54">Scanner</option>
+<option value="55">Tri_Chase</option>
+<option value="56">Tri_Wipe</option>
+<option value="57">Tri_Fade</option>
+<option value="58">Lightning</option>
+<option value="59">ICU</option>
+<option value="60">Multi_Comet</option>
+<option value="61">Dual_Scanner</option>
+<option value="62">Stream_2</option>
+<option value="63">Oscillate</option>
+<option value="64">Pride_2015</option>
+<option value="65">Juggle</option>
+<option value="66">Palette</option>
+<option value="67">Fire_2012</option>
+<option value="68">Colorwaves</option>
+<option value="69">Fill_Noise</option>
+<option value="70">Noise_1</option>
+<option value="71">Noise_2</option>
+<option value="72">Noise_3</option>
+<option value="73">Noise_4</option>
+<option value="74">ColorTwinkle</option>
+<option value="75">Lake</option>
+<option value="76">Meteor</option>
+<option value="77">Smooth_Meteor</option>
+<option value="78">Railway</option>
+<option value="79">Ripple</option>
+<option value="80">TwinkleFox</option>
+<option value="81">TwinkleCat</option>
+<option value="82">HalloweenEyes</option>
+
+</options>
+</state>
+</channel-type>
+
+<channel-type id="presets">
+<item-type>Number</item-type>
+<label>presets</label>
+<description>Auto rotate or change to a saved preset.</description>
+<state>
+<options>
+<option value="1">Preset 1</option>
+<option value="2">Preset 2</option>
+<option value="3">Preset 3</option>
+<option value="4">Preset 4</option>
+<option value="5">Preset 5</option>
+<option value="6">Preset 6</option>
+<option value="7">Preset 7</option>
+<option value="8">Preset 8</option>
+<option value="9">Preset 9</option>
+<option value="10">Preset 10</option>
+<option value="11">Preset 11</option>
+<option value="12">Preset 12</option>
+<option value="13">Preset 13</option>
+<option value="14">Preset 14</option>
+<option value="15">Preset 15</option>
+<option value="16">Preset 16</option>
+<option value="17">Preset 17</option>
+<option value="18">Preset 18</option>
+<option value="19">Preset 19</option>
+<option value="20">Preset 20</option>
+<option value="21">Preset 21</option>
+<option value="22">Preset 22</option>
+<option value="23">Preset 23</option>
+<option value="24">Preset 24</option>
+<option value="25">Preset 25</option>
+</options>
+</state>
+</channel-type>
+
+<channel-type id="presetDuration">
+<item-type>Dimmer</item-type>
+<label>Preset Duration</label>
+<description>Time before moving to the next preset.</description>
+</channel-type>
+
+<channel-type id="presetTransformTime">
+<item-type>Dimmer</item-type>
+<label>Preset Transform Time</label>
+<description>Time it takes to change/fade from one preset to the next.</description>
+</channel-type>
+
+<channel-type id="speed">
+<item-type>Dimmer</item-type>
+<label>FX Speed</label>
+<description>Change the speed of the FX.</description>
+</channel-type>
+
+<channel-type id="intensity">
+<item-type>Dimmer</item-type>
+<label>FX Intensity</label>
+<description>Change the intensity of the FX.</description>
+</channel-type>
+
+<channel-type id="sleep">
+<item-type>Switch</item-type>
+<label>sleep</label>
+<description>Sleep mode: Lower the level of light and turn off after set time.</description>   
+</channel-type>
+
+<channel-type id="presetCycle">
+<item-type>Switch</item-type>
+<label>presetCycle</label>
+<description>Cycle through the saved presets.</description>   
+</channel-type>
+
+</thing:thing-descriptions>
