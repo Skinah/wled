@@ -80,9 +80,9 @@ public class WLedHandler extends BaseThingHandler {
                     break;
                 } // end of HSB type//
                   // this is here for when the command is Percentype and not HSBtype//
-                int tmp = Integer.parseInt(command.toString());
-                tmp = (int) (tmp * 2.55);
-                bridgeHandler.queueToSendMQTT(topic, "" + tmp);
+                double dtmp = Double.parseDouble(command.toString());
+                dtmp = (int) (dtmp * 2.55);
+                bridgeHandler.queueToSendMQTT(topic, "" + dtmp);
                 break;
             case CHANNEL_PALETTES:
                 bridgeHandler.queueToSendMQTT(topic + "/api", "FP=" + command.toString());
@@ -91,14 +91,26 @@ public class WLedHandler extends BaseThingHandler {
                 bridgeHandler.queueToSendMQTT(topic + "/api", "FX=" + command.toString());
                 break;
             case CHANNEL_SPEED:
-                tmp = Integer.parseInt(command.toString());
-                tmp = (int) (tmp * 2.55);
-                bridgeHandler.queueToSendMQTT(topic + "/api", "SX=" + tmp);
+                if ("OFF".equals(command.toString())) {
+                    dtmp = 0;
+                } else if ("ON".equals(command.toString())) {
+                    dtmp = 255;
+                } else {
+                    dtmp = Double.parseDouble(command.toString());
+                    dtmp = (int) (dtmp * 2.55);
+                }
+                bridgeHandler.queueToSendMQTT(topic + "/api", "SX=" + dtmp);
                 break;
             case CHANNEL_INTENSITY:
-                tmp = Integer.parseInt(command.toString());
-                tmp = (int) (tmp * 2.55);
-                bridgeHandler.queueToSendMQTT(topic + "/api", "IX=" + tmp);
+                if ("OFF".equals(command.toString())) {
+                    dtmp = 0;
+                } else if ("ON".equals(command.toString())) {
+                    dtmp = 255;
+                } else {
+                    dtmp = Double.parseDouble(command.toString());
+                    dtmp = (int) (dtmp * 2.55);
+                }
+                bridgeHandler.queueToSendMQTT(topic + "/api", "IX=" + dtmp);
                 break;
             case CHANNEL_SLEEP:
                 if ("ON".equals(command.toString())) {
@@ -111,14 +123,26 @@ public class WLedHandler extends BaseThingHandler {
                 bridgeHandler.queueToSendMQTT(topic + "/api", "PL=" + command.toString());
                 break;
             case CHANNEL_PRESET_DURATION:
-                tmp = Integer.parseInt(command.toString());
-                tmp = (tmp * 600) + 500; // scale from 0.5 seconds to 1 minute
-                bridgeHandler.queueToSendMQTT(topic + "/api", "PT=" + tmp);
+                if ("OFF".equals(command.toString())) {
+                    dtmp = 0;
+                } else if ("ON".equals(command.toString())) {
+                    dtmp = 255;
+                } else {
+                    dtmp = Double.parseDouble(command.toString());
+                    dtmp = (dtmp * 600) + 500; // scale from 0.5 seconds to 1 minute
+                }
+                bridgeHandler.queueToSendMQTT(topic + "/api", "PT=" + dtmp);
                 break;
             case CHANNEL_PRESET_TRANS_TIME:
-                tmp = Integer.parseInt(command.toString());
-                tmp = (tmp * 600) + 500; // scale from 0.5 seconds to 1 minute
-                bridgeHandler.queueToSendMQTT(topic + "/api", "TT=" + tmp);
+                if ("OFF".equals(command.toString())) {
+                    dtmp = 0;
+                } else if ("ON".equals(command.toString())) {
+                    dtmp = 255;
+                } else {
+                    dtmp = Double.parseDouble(command.toString());
+                    dtmp = (dtmp * 600) + 500; // scale from 0.5 seconds to 1 minute
+                }
+                bridgeHandler.queueToSendMQTT(topic + "/api", "TT=" + dtmp);
                 break;
             case CHANNEL_PRESET_CYCLE:
                 if ("ON".equals(command.toString())) {
