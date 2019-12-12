@@ -5,15 +5,15 @@ This Openhab 2 binding allows you to auto find and use the WLED project found he
 
 ## Supported Things
 
-Currently only tested RGB strings, may need more work to support RGBW strings that include descrete white leds.
+Currently only tested RGB strings, may need more work to support RGBW strings that include descrete white leds as I have not looked into what is different for those setups.
 
 ## Discovery
 
-The auto discovery will work with this binding. First setup a mqtt broker thing and supply your mqtt details, then after that connects and shows Online, you can then search and auto find wled strings and strips. This works by finding any topic entries in your broker after /wled/XXXXXXX/
+The auto discovery will work with this binding. First setup a 'mqtt broker' thing and supply your mqtt details. Then after that connects and shows up as Online, you can then search and auto find any wled strings and strips. This works by finding any topic entries in your broker after /wled/XXXXXXX/ so if you wish to use nice friendly names instead of a mac address hash, go into the WLED setup panel and change the settings needed to publish to the desired name or number of your choosing.
 
 ## Binding Configuration
 
-You can also use textual config to setup your wled strings, the most important thing to understand is that you MUST create the uniqueID for the thing to be the same as the mqtt topic. Example is wled/0eb121/.... you would then make the uniqueID be equal to 0eb121.
+You can also use textual config to setup your wled strings, the most important thing to understand is that you MUST create the uniqueID for the thing to be the exact same as the mqtt topic. Example is if you see MQTT topics being produced as wled/0eb121/.... you would then make the uniqueID be equal to 0eb121. As mentioned above you can change this to be a nicer name instead of a number by changing the setup of WLED before you start setting up openhab.
 
 
 ```
@@ -25,6 +25,11 @@ Thing wled 0eb121 "My Christmas Tree" //Christmas tree lights
 
 ```
 
+## Common Issues / FAQ
+
+If changing the colour is not working or taking a while, be sure to 1. Set the FX to SOLID and 2. Set the transition time to the minimum so any changes you wish are made right away. The colour selection is ignored if the lights are in a FX where the primary colour is ignored.
+
+If the drop down Selection lists for FX, Presets and Palettes are not working in the iOS application, you may need to add a mapping to the sitemap declaration for it to work. This does not happen in BasicUI or the Andriod app.
 
 ## Thing Configuration
 
@@ -39,29 +44,32 @@ PR welcome.
 *.items
 
 ```
-Switch XmasTreeOnOff {channel="wled:wled:001:0eb121:colour"}
-Dimmer XmasTreeBrightness {channel="wled:wled:001:0eb121:colour"}
-Color XmasTree "My Christmas Tree" ["Lighting"] {channel="wled:wled:001:0eb121:colour"}
-Number XmasTreeFX "FX" {channel="wled:wled:001:0eb121:fx"}
-Number XmasTreePalette "Palette"  {channel="wled:wled:001:0eb121:palettes"}
-Number XmasTreePresets "Presets"  {channel="wled:wled:001:0eb121:presets"}
-Dimmer XmasTreeSpeed  "FX Speed" {channel="wled:wled:001:0eb121:speed"}
-Dimmer XmasTreeIntensity "FX Intensity"  {channel="wled:wled:001:0eb121:intensity"}
-Switch XmasTreeSleep "Sleep"  {channel="wled:wled:001:0eb121:sleep"}
-Switch XmasTreePresetCycle "presetCycle"  {channel="wled:wled:001:0eb121:presetCycle"}
-Dimmer XmasTreePresetDuration "presetDuration"  {channel="wled:wled:001:0eb121:presetDuration"}
-Dimmer XmasTreePresetTime "presetTransformTime"  {channel="wled:wled:001:0eb121:presetTransformTime"}
+
+Color XmasTree "Christmas Tree" ["Lighting"] {channel="wled:wled:001:0eb121:colour"}
+Switch XmasTreeSwitch   "on/off"    {channel="wled:wled:001:0eb121:colour"}
+Dimmer XmasTreeDimmer   "level"     {channel="wled:wled:001:0eb121:colour"}
+Number XmasTreeFX       "FX"      <text> {channel="wled:wled:001:0eb121:fx"}
+Number XmasTreePalette  "Palette"   <colorwheel>    {channel="wled:wled:001:0eb121:palettes"}
+Number XmasTreePresets  "Preset" <text> {channel="wled:wled:001:0eb121:presets"}
+Dimmer XmasTreeSpeed    "FX Speed"  <time>  {channel="wled:wled:001:0eb121:speed"}
+Dimmer XmasTreeIntensity "FX Intensity" {channel="wled:wled:001:0eb121:intensity"}
+Switch XmasTreePresetCycle "presetCycle" <time> {channel="wled:wled:001:0eb121:presetCycle"}
+Dimmer XmasTreePresetDuration "presetDuration" <time> {channel="wled:wled:001:0eb121:presetDuration"}
+Dimmer XmasTreePresetTime "presetTransformTime" <time> {channel="wled:wled:001:0eb121:presetTransformTime"}
+Switch XmasTreeSleep    "Sleep"     <moon> {channel="wled:wled:001:0eb121:sleep"}
 
 ```
 
 *.sitemap
 
 ```
-Text label="XmasTree" icon="rgb"{
+        Text label="XmasTree" icon="rgb"{
+            Default item=XmasTreeSwitch 
+            Default item=XmasTreeDimmer 
             Default item=XmasTree 
-            Selection item=XmasTreeFX //add mappings here
-            Selection item=XmasTreePalette //add mappings here
-            Selection item=XmasTreePresets //add mappings here
+            Selection item=XmasTreeFX
+            Selection item=XmasTreePalette
+            Selection item=XmasTreePresets
             Default item=XmasTreeSpeed  
             Default item=XmasTreeIntensity
             Default item=XmasTreeSleep

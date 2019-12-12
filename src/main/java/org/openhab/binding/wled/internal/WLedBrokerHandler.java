@@ -180,7 +180,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
 
     @Override
     public void messageArrived(String topic, MqttMessage payload) throws Exception {
-        logger.debug("* Recieved the following new Milight state:{} : {}", topic, payload.toString());
+        logger.debug("* Recieved the following new WLed state:{} : {}", topic, payload.toString());
         lockInComming.lock();
         try {
             fifoIncommingTopic.addLast(topic);
