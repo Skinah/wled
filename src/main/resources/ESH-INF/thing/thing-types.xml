@@ -206,10 +206,10 @@
 <option value="45">45 Fire_Flicker</option>
 <option value="46">46 Gradient</option>
 <option value="47">47 Loading</option>
-<option value="48">48 In_Out</option>
-<option value="49">49 In_In</option>
-<option value="50">50 Out_Out</option>
-<option value="51">51 Out_In</option>
+<option value="48">48 Police</option>
+<option value="49">49 Police All</option>
+<option value="50">50 Two Dots</option>
+<option value="51">51 Two Areas</option>
 <option value="52">52 Circus</option>
 <option value="53">53 Halloween</option>
 <option value="54">54 Tri_Chase</option>
@@ -235,12 +235,18 @@
 <option value="74">74 Lake</option>
 <option value="75">75 Meteor</option>
 <option value="76">76 Smooth_Meteor</option>
-<option value="77">77 Railway</option>
-<option value="78">78 Ripple</option>
+<option value="77">77 Unknown</option>
+<option value="78">78 Railway</option>
 <option value="79">79 TwinkleFox</option>
 <option value="80">80 TwinkleCat</option>
 <option value="81">81 HalloweenEyes</option>
-
+<option value="82">82 Unknown</option>
+<option value="83">83 Solid Pattern</option>
+<option value="84">84 Solid Pattern Tri</option>
+<option value="85">85 Spots</option>
+<option value="86">86 Spots Fade</option>
+<option value="87">87 Glitter</option>
+<option value="88">88 Candle</option>
 </options>
 </state>
 </channel-type>
