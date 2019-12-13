@@ -135,13 +135,19 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             }
             if (messageJSON.contains("<fp>")) {
                 int itmp = Integer.parseInt(resolveXML(messageJSON, "<fp>", 3));
-                updateState(new ChannelUID(channelPrefix + CHANNEL_PRESETS), new DecimalType(itmp));
+                updateState(new ChannelUID(channelPrefix + CHANNEL_PALETTES), new DecimalType(itmp));
             }
 
         } else if ("c".contentEquals(currentTopic)) {
             // todo
         } else if ("g".contentEquals(currentTopic)) {
-            // todo
+            if (messageJSON.contentEquals("0")) {
+                updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), OnOffType.valueOf("OFF"));
+            } else {
+                // int itmp = Integer.parseInt(messageJSON);
+                // rescale it before sending to color channel.
+                // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(itmp));
+            }
         }
     }
 
