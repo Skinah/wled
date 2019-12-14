@@ -23,6 +23,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -139,14 +140,16 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             }
 
         } else if ("c".contentEquals(currentTopic)) {
-            // todo
+            // todo decode rgb from messageJSON
+            // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new HSBType(HSBType.fromRGB(r, g, b)));
         } else if ("g".contentEquals(currentTopic)) {
             if (messageJSON.contentEquals("0")) {
                 updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), OnOffType.valueOf("OFF"));
             } else {
-                // int itmp = Integer.parseInt(messageJSON);
-                // rescale it before sending to color channel.
-                // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(itmp));
+                int itmp = Integer.parseInt(messageJSON);
+                double dtmp = itmp / 2.55;
+                itmp = (int) dtmp;
+                updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(itmp));
             }
         }
     }
