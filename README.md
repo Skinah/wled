@@ -27,6 +27,12 @@ Thing wled 0eb121 "My Christmas Tree" //Christmas tree lights
 
 ## Common Issues / FAQ
 
+If you need help be sure to look at the logs FIRST. You can enable debug log output with this command in the console..
+
+```
+log:set DEBUG org.openhab.binding.wled
+```
+
 If changing the colour is not working or taking a while, be sure to 1. Set the FX to SOLID and 2. Set the transition time to the minimum so any changes you wish are made right away. The colour selection is ignored if the lights are in a FX where the primary colour is ignored.
 
 If the drop down Selection lists for FX, Presets and Palettes are not working in the iOS application, you may need to add a mapping to the sitemap declaration for it to work. This does not happen in BasicUI or the Andriod app.
