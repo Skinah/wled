@@ -33,6 +33,14 @@ If you need help be sure to look at the logs FIRST. You can enable debug log out
 log:set DEBUG org.openhab.binding.wled
 ```
 
+After checking the logs, it is also helpful to look at the mqtt topics with this command:
+
+
+```
+mosquitto_sub -u usernamehere -P passwordhere -p 1883 -v -t 'wled/#'
+```
+
+
 If changing the colour is not working or taking a while, be sure to 1. Set the FX to SOLID and 2. Set the transition time to the minimum so any changes you wish are made right away. The colour selection is ignored if the lights are in a FX where the primary colour is ignored.
 
 If the drop down Selection lists for FX, Presets and Palettes are not working in the iOS application, you may need to add a mapping to the sitemap declaration for it to work. This does not happen in BasicUI or the Andriod app.
