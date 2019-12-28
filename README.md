@@ -78,8 +78,8 @@ Switch XmasTreeSleep    "Sleep"     <moon> {channel="wled:wled:001:0eb121:sleep"
 
 ```
         Text label="XmasTree" icon="rgb"{
-            Default item=XmasTreeSwitch 
-            Default item=XmasTreeDimmer 
+            Switch item=XmasTreeSwitch 
+            Slider item=XmasTreeDimmer 
             Default item=XmasTree 
             Selection item=XmasTreeFX
             Selection item=XmasTreePalette
