@@ -32,6 +32,11 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The {@link WLedDiscoveryService} Discovers and adds to the inbox any Wled devices found.
+ *
+ * @author Matthew Skinner - Initial contribution
+ */
 @Component(service = DiscoveryService.class, immediate = true, configurationPid = "binding.wled")
 public class WLedDiscoveryService extends AbstractDiscoveryService {
 
