@@ -57,29 +57,29 @@
 </config-description>
 </bridge-type>
 
-    <thing-type id="wled">
-        <supported-bridge-type-refs>
-            <bridge-type-ref id="mqttBroker" />
-        </supported-bridge-type-refs>
-        <label>WLed String</label>
-        <description>A Wled based string of LEDs</description>
-        <category>Lightbulb</category> 
-        <channels>
-            <channel id="colour" typeId="colour"/>
-            <channel id="presets" typeId="presets"/>
-            <channel id="presetDuration" typeId="presetDuration"/>
-            <channel id="presetTransformTime" typeId="presetTransformTime"/>
-            <channel id="presetCycle" typeId="presetCycle"/>
-            <channel id="palettes" typeId="palettes"/>
-            <channel id="fx" typeId="fx"/>
-            <channel id="speed" typeId="speed"/>
-            <channel id="intensity" typeId="intensity"/>
-            <channel id="sleep" typeId="sleep"/>
-            
-            
-        </channels>
-    </thing-type>
-    
+	<thing-type id="wled">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="mqttBroker" />
+		</supported-bridge-type-refs>
+		<label>WLed String</label>
+		<description>A Wled based string of LEDs</description>
+		<category>Lightbulb</category> 
+		<channels>
+			<channel id="colour" typeId="colour"/>
+			<channel id="presets" typeId="presets"/>
+			<channel id="presetDuration" typeId="presetDuration"/>
+			<channel id="presetTransformTime" typeId="presetTransformTime"/>
+			<channel id="presetCycle" typeId="presetCycle"/>
+			<channel id="palettes" typeId="palettes"/>
+			<channel id="fx" typeId="fx"/>
+			<channel id="speed" typeId="speed"/>
+			<channel id="intensity" typeId="intensity"/>
+			<channel id="sleep" typeId="sleep"/>
+			
+			
+		</channels>
+	</thing-type>
+	
 <channel-type id="colour">
 <item-type>Color</item-type>
 <label>Color</label>
@@ -319,7 +319,7 @@
 <channel-type id="presetCycle">
 <item-type>Switch</item-type>
 <label>presetCycle</label>
-<description>Cycle through the saved presets.</description>   
+<description>Cycle through the saved presets.</description>	  
 </channel-type>
 
 </thing:thing-descriptions>
