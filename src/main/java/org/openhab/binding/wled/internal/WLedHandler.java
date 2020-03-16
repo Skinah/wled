@@ -14,6 +14,7 @@ package org.openhab.binding.wled.internal;
 
 import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,9 +81,11 @@ public class WLedHandler extends BaseThingHandler {
                     break;
                 } // end of HSB type//
                   // this is here for when the command is Percentype and not HSBtype//
-                double dtmp = Double.parseDouble(command.toString());
-                dtmp = (int) (dtmp * 2.55);
-                bridgeHandler.queueToSendMQTT(topic, "" + dtmp);
+                BigDecimal brightness = new BigDecimal(command.toString());
+                brightness = brightness.multiply(new BigDecimal(2.55));
+
+                // dtmp = (int) (dtmp * 2.55);
+                bridgeHandler.queueToSendMQTT(topic, "" + brightness.intValue());
                 break;
             case CHANNEL_PALETTES:
                 bridgeHandler.queueToSendMQTT(topic + "/api", "FP=" + command.toString());
@@ -91,6 +94,7 @@ public class WLedHandler extends BaseThingHandler {
                 bridgeHandler.queueToSendMQTT(topic + "/api", "FX=" + command.toString());
                 break;
             case CHANNEL_SPEED:
+                double dtmp = 0;
                 if ("OFF".equals(command.toString())) {
                     dtmp = 0;
                 } else if ("ON".equals(command.toString())) {

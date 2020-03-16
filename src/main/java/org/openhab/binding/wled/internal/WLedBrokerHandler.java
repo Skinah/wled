@@ -14,6 +14,8 @@ package org.openhab.binding.wled.internal;
 
 import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -34,6 +36,7 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.HSBType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.eclipse.smarthome.core.thing.Bridge;
@@ -76,6 +79,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
     private LinkedList<String> fifoIncommingTopic = new LinkedList<String>();
     private LinkedList<String> fifoIncommingPayload = new LinkedList<String>();
     public ReentrantLock lockInComming = new ReentrantLock();
+    BigDecimal brightness = new BigDecimal(0);
 
     private MqttClient client;
     private Configuration bridgeConfig;
@@ -136,38 +140,47 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             logger.debug("Chan Prefix\t={}", channelPrefix);
         }
 
-        if ("v".contentEquals(currentTopic)) {
-            if (messageJSON.contains("<cy>1</cy>")) {
-                updateState(new ChannelUID(channelPrefix + CHANNEL_PRESET_CYCLE), OnOffType.valueOf("ON"));
-            } else {
-                updateState(new ChannelUID(channelPrefix + CHANNEL_PRESET_CYCLE), OnOffType.valueOf("OFF"));
-            }
-            if (messageJSON.contains("<nl>1</nl>")) {
-                updateState(new ChannelUID(channelPrefix + CHANNEL_SLEEP), OnOffType.valueOf("ON"));
-            } else {
-                updateState(new ChannelUID(channelPrefix + CHANNEL_SLEEP), OnOffType.valueOf("OFF"));
-            }
-            if (messageJSON.contains("<fx>")) {
-                int itmp = Integer.parseInt(resolveXML(messageJSON, "<fx>", 3));
-                updateState(new ChannelUID(channelPrefix + CHANNEL_FX), new DecimalType(itmp));
-            }
-            if (messageJSON.contains("<fp>")) {
-                int itmp = Integer.parseInt(resolveXML(messageJSON, "<fp>", 3));
-                updateState(new ChannelUID(channelPrefix + CHANNEL_PALETTES), new DecimalType(itmp));
-            }
-
-        } else if ("c".contentEquals(currentTopic)) {
-            // todo decode rgb from messageJSON
-            // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new HSBType(HSBType.fromRGB(r, g, b)));
-        } else if ("g".contentEquals(currentTopic)) {
-            if (messageJSON.contentEquals("0")) {
-                updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), OnOffType.valueOf("OFF"));
-            } else {
-                int itmp = Integer.parseInt(messageJSON);
-                double dtmp = itmp / 2.55;
-                itmp = (int) dtmp;
-                updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(itmp));
-            }
+        switch (currentTopic) {
+            case "v":
+                if (messageJSON.contains("<cy>1</cy>")) {
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_PRESET_CYCLE), OnOffType.valueOf("ON"));
+                } else {
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_PRESET_CYCLE), OnOffType.valueOf("OFF"));
+                }
+                if (messageJSON.contains("<nl>1</nl>")) {
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_SLEEP), OnOffType.valueOf("ON"));
+                } else {
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_SLEEP), OnOffType.valueOf("OFF"));
+                }
+                if (messageJSON.contains("<fx>")) {
+                    int itmp = Integer.parseInt(resolveXML(messageJSON, "<fx>", 3));
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_FX), new DecimalType(itmp));
+                }
+                if (messageJSON.contains("<fp>")) {
+                    int itmp = Integer.parseInt(resolveXML(messageJSON, "<fp>", 3));
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_PALETTES), new DecimalType(itmp));
+                }
+                break;
+            case "c":
+                int rgb = Integer.parseInt(messageJSON.substring(1), 16);
+                int r = (rgb >>> 16) & 0xFF;
+                int g = (rgb >>> 8) & 0xFF;
+                int b = (rgb >>> 0) & 0xFF;
+                updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR),
+                        new HSBType(HSBType.fromRGB(r, g, b).getHue() + "," + HSBType.fromRGB(r, g, b).getSaturation()
+                                + "," + brightness));
+                // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), HSBType.fromRGB(r, g, b));
+                break;
+            case "g":
+                if (messageJSON.contentEquals("0")) {
+                    brightness = new BigDecimal(0);
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), OnOffType.valueOf("OFF"));
+                } else {
+                    brightness = new BigDecimal(messageJSON);
+                    brightness = brightness.divide(new BigDecimal(2.55), RoundingMode.HALF_UP);
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(brightness.intValue()));
+                }
+                break;
         }
     }
 
@@ -447,14 +460,17 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
         disconnectMQTT();
 
         if (sendQueuedMQTTTimerJob != null) {
+            sendQueuedMQTTTimerJob.cancel(false);
             sendQueuedMQTTTimerJob.cancel(true);
             sendQueuedMQTTTimerJob = null;
         }
         if (processIncommingMQTTTimerJob != null) {
+            processIncommingMQTTTimerJob.cancel(false);
             processIncommingMQTTTimerJob.cancel(true);
             processIncommingMQTTTimerJob = null;
         }
         if (checkConnectionJob != null) {
+            checkConnectionJob.cancel(false);
             checkConnectionJob.cancel(true);
             checkConnectionJob = null;
         }
