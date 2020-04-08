@@ -45,6 +45,7 @@ public class WLedHandler extends BaseThingHandler {
     private String deviceID = this.getThing().getUID().getId();// eg 0x014
     private final Logger logger = LoggerFactory.getLogger(WLedHandler.class);
     private WLedBrokerHandler bridgeHandler;
+    @SuppressWarnings("unused")
     private Configuration config;
 
     public WLedHandler(Thing thing) {

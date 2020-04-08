@@ -244,7 +244,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
 
     @Override
     public void connectComplete(boolean reconnect, java.lang.String serverURI) {
-        logger.info("Sucessfully connected to the MQTT broker.");
+        // logger.info("Sucessfully connected to the MQTT broker.");
         updateStatus(ThingStatus.ONLINE);
     }
 
@@ -272,16 +272,18 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             }
             options.setMaxInflight(30); // up to 30 messages at once can be sent without a token back
             options.setAutomaticReconnect(true);
-            options.setKeepAliveInterval(15);
+            options.setKeepAliveInterval(20);
             options.setConnectionTimeout(20); // connection must be made in under 20 seconds
             client.setCallback(this);
             client.connect(options);
         } catch (MqttException e) {
             logger.error("Error: Could not connect to MQTT broker.{}", e);
+            client = null;
             return false;
         }
         confirmedAddress = bridgeConfig.get(CONFIG_MQTT_ADDRESS).toString();
         updateStatus(ThingStatus.ONLINE);
+        recordBridgeID();
         return true;
     }
 
@@ -339,8 +341,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
         }
 
         try {
-            if (fifoOutgoingTopic.size() > 1 && fifoOutgoingTopic.getLast().equals(topic)
-                    && !fifoOutgoingPayload.getLast().equals("{\"state\":\"ON\",\"level\":0}")) {
+            if (fifoOutgoingTopic.size() > 1 && fifoOutgoingTopic.getLast().equals(topic)) {
                 lockOutGoing.lock();
                 try {
                     logger.debug("Message reduction has removed a MQTT message.");
@@ -398,13 +399,12 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
 
     public void disconnectMQTT() {
         try {
+            client.disconnect();
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                     "Currently disconnected from the MQTT broker.");
-            client.disconnect();
-            logger.debug("disconnectMQTT() is going to disconnect from the MQTT broker.");
             // wait needed to fix issue when trying to reconnect too fast after a disconnect.
-            Thread.sleep(3000);
-        } catch (MqttException | InterruptedException e) {
+            // Thread.sleep(3000);
+        } catch (MqttException e) {
             logger.error("Could not disconnect from MQTT broker.{}", e);
         }
     }
@@ -430,35 +430,25 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
                     triggerRefresh = false;
                     subscribeToMQTT();
                 }
-            } else {
-                logger.debug("pollFirstConnection() is trying to connect to your MQTT broker now.");
-                if (connectMQTT(false)) { // fetch
-                                          // all
-                                          // states
-                                          // to
-                                          // update
-                                          // controls.
-                    recordBridgeID();
-                } else {
-                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-                            "Could not connect to the MQTT broker, check the address, user and pasword are correct and the broker is online.");
-                }
+            } else if (client == null) {
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
+                        "Could not connect to the MQTT broker, check the address, user and pasword are correct and the broker is online.");
+                connectMQTT(false);
             }
         }
     };
 
     @Override
     public void initialize() {
-        logger.debug("WLed binding is trying to connect to your MQTT Broker.");
         bridgeConfig = thing.getConfiguration();
-        checkConnectionJob = checkConnection.scheduleWithFixedDelay(pollConnection, 0, 10, TimeUnit.SECONDS);
+        checkConnectionJob = checkConnection.scheduleWithFixedDelay(pollConnection, 0, 30, TimeUnit.SECONDS);
     }
 
     @Override
     public void dispose() {
-        logger.info("Bridge dispose() called, disconnecting from the MQTT broker.");
-        disconnectMQTT();
-
+        if (client != null) {
+            disconnectMQTT();
+        }
         if (sendQueuedMQTTTimerJob != null) {
             sendQueuedMQTTTimerJob.cancel(false);
             sendQueuedMQTTTimerJob.cancel(true);
