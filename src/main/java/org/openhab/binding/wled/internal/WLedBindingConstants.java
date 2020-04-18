@@ -10,6 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+
 package org.openhab.binding.wled.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;

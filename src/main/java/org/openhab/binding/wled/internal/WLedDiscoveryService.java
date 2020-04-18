@@ -103,7 +103,7 @@ public class WLedDiscoveryService extends AbstractDiscoveryService {
             client.subscribe("wled/#", 1);
 
         } catch (MqttException e) {
-            logger.error("Error: Could not connect to MQTT broker to search for New Things.{}", e);
+            logger.error("Could not connect to MQTT broker to search for New Things. {}", e);
         }
     }
 

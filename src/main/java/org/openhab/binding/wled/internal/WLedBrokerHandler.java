@@ -10,6 +10,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+
 package org.openhab.binding.wled.internal;
 
 import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
@@ -238,7 +239,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             client.subscribe("wled/#", 1);
             logger.info("Sucessfully subscribed to wled/#");
         } catch (MqttException e) {
-            logger.error("Error: Could not subscribe to 'wled/#' cause is:{}", e);
+            logger.error("Could not subscribe to wled/# cause is:{}", e);
         }
     }
 
@@ -277,7 +278,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             client.setCallback(this);
             client.connect(options);
         } catch (MqttException e) {
-            logger.error("Error: Could not connect to MQTT broker.{}", e);
+            logger.error("Could not connect to MQTT broker, cause is {}", e);
             client = null;
             return false;
         }
@@ -300,9 +301,9 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
                         false); // Not retained
             }
         } catch (MqttPersistenceException e) {
-            logger.error("Error: Could not connect/send to MQTT broker:{}", e);
+            logger.error("Could not connect/send to MQTT broker: {}", e);
         } catch (MqttException e) {
-            logger.error("Error: Could not connect/send to MQTT broker:{}", e);
+            logger.error("Could not connect/send to MQTT broker: {}", e);
         }
     }
 
@@ -405,7 +406,7 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
             // wait needed to fix issue when trying to reconnect too fast after a disconnect.
             // Thread.sleep(3000);
         } catch (MqttException e) {
-            logger.error("Could not disconnect from MQTT broker.{}", e);
+            logger.error("Could not disconnect from MQTT broker. {}", e);
         }
     }
 
