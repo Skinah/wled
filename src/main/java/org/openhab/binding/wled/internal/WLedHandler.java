@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.core.library.types.HSBType;
+import org.eclipse.smarthome.core.library.types.IncreaseDecreaseType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -45,6 +46,7 @@ public class WLedHandler extends BaseThingHandler {
     private String deviceID = this.getThing().getUID().getId();// eg 0x014
     private final Logger logger = LoggerFactory.getLogger(WLedHandler.class);
     private WLedBrokerHandler bridgeHandler;
+    BigDecimal brightness = new BigDecimal(0);
     @SuppressWarnings("unused")
     private Configuration config;
 
@@ -70,6 +72,7 @@ public class WLedHandler extends BaseThingHandler {
                     break;
                 } else if ("0".equals(command.toString()) || "OFF".equals(command.toString())) {
                     bridgeHandler.queueToSendMQTT(topic, command.toString());
+                    brightness = new BigDecimal(0);
                     break;
                 } else if (command instanceof HSBType) {
                     HSBType hsb = new HSBType(command.toString());
@@ -79,10 +82,27 @@ public class WLedHandler extends BaseThingHandler {
                     }
                     hex = "#" + hex;
                     bridgeHandler.queueToSendMQTT(topic + "/col", hex);
+                    brightness = new BigDecimal(hsb.getBrightness().toString());
+                    brightness = brightness.multiply(new BigDecimal(2.55));
                     break;
-                } // end of HSB type//
-                  // this is here for when the command is Percentype and not HSBtype//
-                BigDecimal brightness = new BigDecimal(command.toString());
+                } else if (command instanceof IncreaseDecreaseType) {
+                    if ("INCREASE".equals(command.toString())) {
+                        brightness = brightness.add(new BigDecimal(25.5));
+                        if (brightness.intValue() > 255) {
+                            brightness = new BigDecimal(255);
+                        }
+                        bridgeHandler.queueToSendMQTT(topic, "" + brightness.intValue());
+                    } else {
+                        brightness = brightness.subtract(new BigDecimal(25.5));
+                        if (brightness.intValue() < 0) {
+                            brightness = new BigDecimal(0);
+                        }
+                        bridgeHandler.queueToSendMQTT(topic, "" + brightness.intValue());
+                    }
+                    break;
+                }
+                // this is here for when the command is Percentype and not HSBtype//
+                brightness = new BigDecimal(command.toString());
                 brightness = brightness.multiply(new BigDecimal(2.55));
 
                 // dtmp = (int) (dtmp * 2.55);
@@ -158,6 +178,7 @@ public class WLedHandler extends BaseThingHandler {
                 break;
 
         } // end switch
+
     }
 
     @Override
