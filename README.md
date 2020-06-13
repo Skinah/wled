@@ -8,14 +8,14 @@ This Openhab 2 binding allows you to auto find and use the WLED project found he
 | Thing Type ID | Description |
 |-|-|
 | `wled` | Use this for a RGB string. |
-| `mqttBroker` | This is used to connect directly to your MQTT broker ie Mosquitto. Then each wled thing |
+| `mqttBroker` | This is used to connect directly to your MQTT broker ie Mosquitto. Then each wled thing needs to select one of these as a bridge. Your MQTT user and pass are needed in the config for this to connect. |
 
 
 Currently only implemented RGB strings. Have not look at what is needed to support RGBW strings that include discrete white leds as I have not looked into what is different for those setups.
 
 ## Discovery
 
-The auto discovery will work with this binding. First setup a 'mqtt broker' thing and supply your mqtt details. Then after that connects and shows up as Online, you can then search and auto find any wled strings and strips. This works by finding any topic entries in your broker after /wled/XXXXXXX/ so if you wish to use nice friendly names instead of a mac address hash, go into the WLED setup panel and change the settings needed to publish to the desired name or number of your choosing.
+The auto discovery will work with this binding. First setup a `mqttBroker` thing and supply your mqtt details. Then after that connects and shows up as Online, you can then search and auto find any wled strings and strips. This works by finding any topic entries in your broker after /wled/XXXXXXX/ so if you wish to use nice friendly names instead of a mac address hash, go into the WLED setup panel and change the settings needed to publish to the desired name or number of your choosing.
 
 ## Binding Configuration
 
