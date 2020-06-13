@@ -5,7 +5,13 @@ This Openhab 2 binding allows you to auto find and use the WLED project found he
 
 ## Supported Things
 
-Currently only tested RGB strings, may need more work to support RGBW strings that include descrete white leds as I have not looked into what is different for those setups.
+| Thing Type ID | Description |
+|-|-|
+| `wled` | Use this for a RGB string. |
+| `mqttBroker` | This is used to connect directly to your MQTT broker ie Mosquitto. Then each wled thing |
+
+
+Currently only implemented RGB strings. Have not look at what is needed to support RGBW strings that include discrete white leds as I have not looked into what is different for those setups.
 
 ## Discovery
 
