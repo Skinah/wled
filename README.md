@@ -10,6 +10,7 @@ This Openhab 2 binding allows you to auto find and use the WLED project found he
 | `wled` | Use this for a RGB string. |
 | `mqttBroker` | This is used to connect directly to your MQTT broker ie Mosquitto. Then each wled thing needs to select one of these as a bridge. Your MQTT user and pass are needed in the config for this to connect. |
 
+> NOTE: _To be clear: this binding does not use the openHAB MQTT binding - it creates its own connection to your MQTT broker. You cannot use existing MQTT bridges (defined using the MQTT binding) with this WLED binding!_
 
 Currently only implemented RGB strings. Have not look at what is needed to support RGBW strings that include discrete white leds as I have not looked into what is different for those setups.
 
