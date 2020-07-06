@@ -75,6 +75,7 @@
 			<channel id="speed" typeId="speed"/>
 			<channel id="intensity" typeId="intensity"/>
 			<channel id="sleep" typeId="sleep"/>
+			<channel id="savePreset" typeId="savePreset"/>
 		</channels>
 	</thing-type>
 	

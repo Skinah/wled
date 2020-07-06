@@ -147,7 +147,7 @@ public class WLedHandler extends BaseThingHandler {
             case CHANNEL_PRESETS:
                 bridgeHandler.queueToSendMQTT(topic + "/api", "PL=" + command.toString());
                 break;
-            case CHANNEL_SAVE_PRESETS:
+            case CHANNEL_SAVE_PRESET:
                 bridgeHandler.queueToSendMQTT(topic + "/api", "PS=" + command.toString());
                 break;
             case CHANNEL_PRESET_DURATION:

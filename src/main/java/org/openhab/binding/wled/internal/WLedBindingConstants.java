@@ -42,7 +42,7 @@ public class WLedBindingConstants {
     public static final String CHANNEL_COLOUR = "colour";
     public static final String CHANNEL_PALETTES = "palettes";
     public static final String CHANNEL_PRESETS = "presets";
-    public static final String CHANNEL_SAVE_PRESETS = "savePresets";
+    public static final String CHANNEL_SAVE_PRESET = "savePreset";
     public static final String CHANNEL_PRESET_DURATION = "presetDuration";
     public static final String CHANNEL_PRESET_TRANS_TIME = "presetTransformTime";
     public static final String CHANNEL_PRESET_CYCLE = "presetCycle";
