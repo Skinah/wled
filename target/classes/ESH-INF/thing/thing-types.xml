@@ -255,15 +255,15 @@
 <option value="98">98 Percent</option>
 <option value="99">99 RippleRainbow</option>
 <option value="100">100 Heartbeat</option>
-<option value="101">101 Pacifica</option>
-<option value="102">102 Candle Multi</option>
-<option value="103">103 Solid Glitter</option>
-<option value="104">104 Sunrise</option>
-<option value="105">105 Phased</option>
-<option value="106">106 Twinkle Up</option>
-<option value="107">107 Noise Pal</option>
-<option value="108">108 Sinewave</option>
-<option value="109">109 Phased Noise</option>
+<option value="101">101 Pacifica</option> 
+<option value="102">102 Candle Multi</option> 
+<option value="103">103 Solid Glitter</option> 
+<option value="104">104 Sunrise</option> 
+<option value="105">105 Phased</option> 
+<option value="106">106 Twinkle Up</option> 
+<option value="107">107 Noise Pal</option> 
+<option value="108">108 Sinewave</option> 
+<option value="109">109 Phased Noise</option> 
 <option value="110">110 Flow</option>
 </options>
 </state>
