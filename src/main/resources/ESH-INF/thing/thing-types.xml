@@ -59,7 +59,7 @@
 
 	<thing-type id="wled">
 		<supported-bridge-type-refs>
-			<bridge-type-ref id="mqttBroker" />
+			<bridge-type-ref id="mqttBroker"/>
 		</supported-bridge-type-refs>
 		<label>WLed String</label>
 		<description>A Wled based string of LEDs</description>
@@ -75,8 +75,6 @@
 			<channel id="speed" typeId="speed"/>
 			<channel id="intensity" typeId="intensity"/>
 			<channel id="sleep" typeId="sleep"/>
-			
-			
 		</channels>
 	</thing-type>
 	
@@ -300,10 +298,10 @@
 </state>
 </channel-type>
 
-<channel-type id="savePresets">
+<channel-type id="savePreset">
 <item-type>Number</item-type>
 <label>Save Preset</label>
-<description>Save current state to Preset Location.</description>
+<description>Save current state to selected location.</description>
 <state>
 <options>
 <option value="1">Preset 1</option>
