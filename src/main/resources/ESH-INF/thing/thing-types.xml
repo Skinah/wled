@@ -300,6 +300,32 @@
 </state>
 </channel-type>
 
+<channel-type id="savePresets">
+<item-type>Number</item-type>
+<label>Save Preset</label>
+<description>Save current state to Preset Location.</description>
+<state>
+<options>
+<option value="1">Preset 1</option>
+<option value="2">Preset 2</option>
+<option value="3">Preset 3</option>
+<option value="4">Preset 4</option>
+<option value="5">Preset 5</option>
+<option value="6">Preset 6</option>
+<option value="7">Preset 7</option>
+<option value="8">Preset 8</option>
+<option value="9">Preset 9</option>
+<option value="10">Preset 10</option>
+<option value="11">Preset 11</option>
+<option value="12">Preset 12</option>
+<option value="13">Preset 13</option>
+<option value="14">Preset 14</option>
+<option value="15">Preset 15</option>
+<option value="16">Preset 16</option>
+</options>
+</state>
+</channel-type>
+
 <channel-type id="presetDuration">
 <item-type>Dimmer</item-type>
 <label>Preset Duration</label>
