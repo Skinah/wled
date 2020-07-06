@@ -72,6 +72,7 @@ Dimmer XmasTreeDimmer   "level"     {channel="wled:wled:001:0eb121:colour"}
 Number XmasTreeFX       "FX"      <text> {channel="wled:wled:001:0eb121:fx"}
 Number XmasTreePalette  "Palette"   <colorwheel>    {channel="wled:wled:001:0eb121:palettes"}
 Number XmasTreePresets  "Preset" <text> {channel="wled:wled:001:0eb121:presets"}
+Number XmasTreeSavePresets  "Save Preset" <text> {channel="wled:wled:001:0eb121:savePresets"}
 Dimmer XmasTreeSpeed    "FX Speed"  <time>  {channel="wled:wled:001:0eb121:speed"}
 Dimmer XmasTreeIntensity "FX Intensity" {channel="wled:wled:001:0eb121:intensity"}
 Switch XmasTreePresetCycle "presetCycle" <time> {channel="wled:wled:001:0eb121:presetCycle"}
@@ -97,6 +98,7 @@ Switch XmasTreeSleep    "Sleep"     <moon> {channel="wled:wled:001:0eb121:sleep"
             Default item=XmasTreePresetCycle  
             Default item=XmasTreePresetDuration 
             Default item=XmasTreePresetTime
+            Selection item=XmasTreeSavePresets
         }
         
 ```
