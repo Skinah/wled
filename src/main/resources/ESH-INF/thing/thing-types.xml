@@ -250,26 +250,11 @@
 <option value="89">89 Fireworks Starburst</option>
 <option value="90">90 Fireworks 1D</option>
 <option value="91">91 BouncingBalls</option>
-<option value="92">92 Sinelon</option>
-<option value="93">93 Sinelon_Dual</option>
-<option value="94">94 Sinelon_Rainbow</option>
-<option value="95">95 Popcorn</option>
 <option value="96">96 Drip</option>
 <option value="97">97 Plasma</option>
 <option value="98">98 Percent</option>
 <option value="99">99 RippleRainbow</option>
 <option value="100">100 Heartbeat</option>
-<option value="101">101 Pacifica</option>
-<option value="102">102 Candle_Multi</option>
-<option value="103">103 Solid_Glitter</option>
-<option value="104">104 Sunrise</option>
-<option value="105">105 Phased</option>
-<option value="106">106 Twinkleup</option>
-<option value="107">107 Noisepal</option>
-<option value="108">108 Sinewave</option>
-<option value="109">109 Phasednoise</option>
-<option value="110">110 Flow</option>
-<option value="111">111 Chunchun</option>
 </options>
 </state>
 </channel-type>
