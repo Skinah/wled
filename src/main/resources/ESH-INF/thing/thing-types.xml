@@ -76,6 +76,7 @@
 			<channel id="intensity" typeId="intensity"/>
 			<channel id="sleep" typeId="sleep"/>
 			<channel id="savePreset" typeId="savePreset"/>
+            		<channel id="online" typeId="online"/>
 		</channels>
 	</thing-type>
 	
@@ -361,4 +362,10 @@
 <description>Cycle through the saved presets.</description>	  
 </channel-type>
 
+<channel-type id="online">
+<item-type>Switch</item-type>
+<label>online</label>
+<description>Current online status.</description>   
+</channel-type>
+	
 </thing:thing-descriptions>
