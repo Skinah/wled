@@ -182,6 +182,13 @@ public class WLedBrokerHandler extends BaseBridgeHandler implements MqttCallback
                     updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(brightness.intValue()));
                 }
                 break;
+            case "status":
+                if (messageJSON.contentEquals("online")) {
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_ONLINE), OnOffType.valueOf("ON"));
+                } else if (messageJSON.contentEquals("offline")) {
+                    updateState(new ChannelUID(channelPrefix + CHANNEL_ONLINE), OnOffType.valueOf("OFF"));
+                }
+                break;
         }
     }
 
