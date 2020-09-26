@@ -156,6 +156,9 @@ public class WLedHandler extends BaseThingHandler {
 
     private void processState(String message) {
         logger.trace("WLED states are:{}", message);
+        if (thing.getStatus() != ThingStatus.ONLINE) {
+            updateStatus(ThingStatus.ONLINE);
+        }
         if (message.contains("<ac>0</ac>")) {
             updateState(CHANNEL_MASTER_BRIGHTNESS, OnOffType.OFF);
         } else {
@@ -362,7 +365,6 @@ public class WLedHandler extends BaseThingHandler {
     @Override
     public void initialize() {
         config = getConfigAs(WLedConfiguration.class);
-        updateStatus(ThingStatus.ONLINE);
         pollingFuture = threadPool.scheduleWithFixedDelay(this::pollLED, 1, config.pollTime, TimeUnit.SECONDS);
     }
 
