@@ -15,193 +15,378 @@ package org.openhab.binding.wled.internal;
 import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.math.RoundingMode;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import org.eclipse.smarthome.config.core.Configuration;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.api.Request;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.smarthome.core.library.types.HSBType;
 import org.eclipse.smarthome.core.library.types.IncreaseDecreaseType;
+import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.PercentType;
+import org.eclipse.smarthome.core.library.types.StringType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
-import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
+import org.eclipse.smarthome.core.types.RefreshType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link WLedHandler} is responsible for handling commands, which are
- * sent to one of the channels.
+ * The {@link WLedHandler} is responsible for handling commands and states, which are
+ * sent to one of the channels or http replies back.
  *
  * @author Matthew Skinner - Initial contribution
  */
 
+@NonNullByDefault
 public class WLedHandler extends BaseThingHandler {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final HttpClient httpClient;
+    private @Nullable ScheduledFuture<?> pollingFuture = null;
+    private ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(1);
+    private BigDecimal masterBrightness = new BigDecimal(0);
+    private HSBType primaryColor = new HSBType();
+    private HSBType secondaryColor = new HSBType();
+    private WLedConfiguration config;
+    private boolean hasWhite = false;
 
-    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<ThingTypeUID>(
-            Arrays.asList(THING_TYPE_WLED));
-    private String deviceID = this.getThing().getUID().getId();// eg 0x014
-    private final Logger logger = LoggerFactory.getLogger(WLedHandler.class);
-    private WLedBrokerHandler bridgeHandler;
-    BigDecimal brightness = new BigDecimal(0);
-    @SuppressWarnings("unused")
-    private Configuration config;
-
-    public WLedHandler(Thing thing) {
+    public WLedHandler(Thing thing, HttpClient httpClient) {
         super(thing);
+        this.httpClient = httpClient;
+        config = getConfigAs(WLedConfiguration.class);
+    }
+
+    void sendGetRequest(String url) {
+        Request request = httpClient.newRequest(config.address + url);
+        request.timeout(10, TimeUnit.SECONDS);
+        request.method(HttpMethod.GET);
+        request.header(HttpHeader.ACCEPT_ENCODING, "gzip");
+
+        logger.debug("Sending WLED GET:{}", url);
+        String errorReason = "";
+        try {
+            ContentResponse contentResponse = request.send();
+            if (contentResponse.getStatus() == 200) {
+                processState(contentResponse.getContentAsString());
+                return;
+            } else {
+                errorReason = String.format("WLED request failed with %d: %s", contentResponse.getStatus(),
+                        contentResponse.getReason());
+            }
+        } catch (TimeoutException e) {
+            errorReason = "TimeoutException: WLED was not reachable on your network";
+        } catch (ExecutionException e) {
+            errorReason = String.format("ExecutionException: %s", e.getMessage());
+        } catch (InterruptedException e) {
+            errorReason = String.format("InterruptedException: %s", e.getMessage());
+        }
+        updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, errorReason);
+    }
+
+    private HSBType parseToHSBType(String message, String element) {
+        int startIndex = message.indexOf(element);
+        if (startIndex == -1) {
+            return new HSBType();
+        }
+        int endIndex = message.indexOf("<", startIndex + element.length());
+        int r = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
+        // look for second element
+        startIndex = message.indexOf(element, endIndex);
+        if (startIndex == -1) {
+            return new HSBType();
+        }
+        endIndex = message.indexOf("<", startIndex + element.length());
+        int g = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
+        // look for third element called <cl>
+        startIndex = message.indexOf(element, endIndex);
+        if (startIndex == -1) {
+            return new HSBType();
+        }
+        endIndex = message.indexOf("<", startIndex + element.length());
+        int b = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
+        return HSBType.fromRGB(r, g, b);
+    }
+
+    private void parseColours(String message) {
+        primaryColor = parseToHSBType(message, "<cl>");
+        updateState(CHANNEL_PRIMARY_COLOR, primaryColor);
+        secondaryColor = parseToHSBType(message, "<cs>");
+        updateState(CHANNEL_SECONDARY_COLOR, secondaryColor);
+        // updateState(CHANNEL_PRIMARY_COLOR, new HSBType(HSBType.fromRGB(r, g, b).getHue() + ","
+        // + HSBType.fromRGB(r, g, b).getSaturation() + "," + primaryBrightness));
+
+        // updateState(CHANNEL_COLOUR, HSBType.fromRGB(r, g, b));
+        /*
+         * case "c":
+         * int rgb = Integer.parseInt(message.substring(1), 16);
+         * int r = (rgb >>> 16) & 0xFF;
+         * int g = (rgb >>> 8) & 0xFF;
+         * int b = (rgb >>> 0) & 0xFF;
+         * updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR),
+         * new HSBType(HSBType.fromRGB(r, g, b).getHue() + "," + HSBType.fromRGB(r, g, b).getSaturation()
+         * + "," + brightness));
+         * // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), HSBType.fromRGB(r, g, b));
+         * break;
+         * case "g":
+         * if (message.contentEquals("0")) {
+         * brightness = new BigDecimal(0);
+         * updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), OnOffType.OFF);
+         * } else {
+         * brightness = new BigDecimal(message);
+         * brightness = brightness.divide(new BigDecimal(2.55), RoundingMode.HALF_UP);
+         * updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(brightness.intValue()));
+         * }
+         * break;
+         */
+    }
+
+    private void processState(String message) {
+        logger.trace("WLED states are:{}", message);
+        if (message.contains("<ac>0</ac>")) {
+            updateState(CHANNEL_MASTER_BRIGHTNESS, OnOffType.OFF);
+        } else {
+            masterBrightness = new BigDecimal(getValue(message, "<ac>")).divide(new BigDecimal(2.55),
+                    RoundingMode.HALF_UP);
+            updateState(CHANNEL_MASTER_BRIGHTNESS, new PercentType(masterBrightness));
+        }
+        if (message.contains("<ix>0</ix>")) {
+            updateState(CHANNEL_INTENSITY, OnOffType.OFF);
+        } else {
+            BigDecimal bigTemp = new BigDecimal(getValue(message, "<ix>")).divide(new BigDecimal(2.55),
+                    RoundingMode.HALF_UP);
+            updateState(CHANNEL_INTENSITY, new PercentType(bigTemp));
+        }
+        if (message.contains("<cy>1</cy>")) {
+            updateState(CHANNEL_PRESET_CYCLE, OnOffType.ON);
+        } else {
+            updateState(CHANNEL_PRESET_CYCLE, OnOffType.OFF);
+        }
+        if (message.contains("<nl>1</nl>")) {
+            updateState(CHANNEL_SLEEP, OnOffType.ON);
+        } else {
+            updateState(CHANNEL_SLEEP, OnOffType.OFF);
+        }
+        if (message.contains("<fx>")) {
+            updateState(CHANNEL_FX, new StringType(getValue(message, "<fx>")));
+        }
+        if (message.contains("<sx>")) {
+            BigDecimal bigTemp = new BigDecimal(getValue(message, "<sx>")).divide(new BigDecimal(2.55),
+                    RoundingMode.HALF_UP);
+            updateState(CHANNEL_SPEED, new PercentType(bigTemp));
+        }
+        if (message.contains("<fp>")) {
+            updateState(CHANNEL_PALETTES, new StringType(getValue(message, "<fp>")));
+        }
+        if (message.contains("<wv>-1</wv>")) {
+            hasWhite = false;
+        } else {
+            hasWhite = true;
+        }
+        parseColours(message);
+    }
+
+    /**
+     *
+     * @param hsb
+     * @return WLED needs the letter h followed by 2 digit HEX code for RRGGBB
+     */
+    private String createColorHex(HSBType hsb) {
+        String hex = Integer.toHexString(hsb.getRGB() & 0xffffff);
+        while (hex.length() < 6) {
+            hex = "0" + hex;
+        }
+        return "h" + hex;
     }
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        if (command.toString() == "REFRESH") {
-            logger.trace("'REFRESH' command has been called for:{}", channelUID);
-            // This will cause all retained messages to be resent.
-            WLedBrokerHandler.triggerRefresh = true;
+        if (command instanceof RefreshType) {
+            switch (channelUID.getId()) {
+                case CHANNEL_PRIMARY_COLOR:
+                    sendGetRequest("/win");
+            }
             return;
         }
-
-        String topic = "wled/" + deviceID;
-
+        logger.debug("command {} sent to {}", command, channelUID.getId());
         switch (channelUID.getId()) {
-            case CHANNEL_COLOUR:
-                if ("ON".equals(command.toString())) {
-                    bridgeHandler.queueToSendMQTT(topic, command.toString());
-                    break;
-                } else if ("0".equals(command.toString()) || "OFF".equals(command.toString())) {
-                    bridgeHandler.queueToSendMQTT(topic, command.toString());
-                    brightness = new BigDecimal(0);
-                    break;
-                } else if (command instanceof HSBType) {
-                    HSBType hsb = new HSBType(command.toString());
-                    String hex = Integer.toHexString(hsb.getRGB() & 0xffffff);
-                    while (hex.length() < 6) {
-                        hex = "0" + hex;
-                    }
-                    hex = "#" + hex;
-                    bridgeHandler.queueToSendMQTT(topic + "/col", hex);
-                    brightness = new BigDecimal(hsb.getBrightness().toString());
-                    brightness = brightness.multiply(new BigDecimal(2.55));
-                    break;
-                } else if (command instanceof IncreaseDecreaseType) {
-                    if ("INCREASE".equals(command.toString())) {
-                        brightness = brightness.add(new BigDecimal(25.5));
-                        if (brightness.intValue() > 255) {
-                            brightness = new BigDecimal(255);
-                        }
-                        bridgeHandler.queueToSendMQTT(topic, "" + brightness.intValue());
+            case CHANNEL_MASTER_BRIGHTNESS:
+                if (command instanceof OnOffType) {
+                    if (OnOffType.OFF.equals(command)) {
+                        sendGetRequest("/win&T=0");
                     } else {
-                        brightness = brightness.subtract(new BigDecimal(25.5));
-                        if (brightness.intValue() < 0) {
-                            brightness = new BigDecimal(0);
-                        }
-                        bridgeHandler.queueToSendMQTT(topic, "" + brightness.intValue());
+                        sendGetRequest("/win&T=1");
                     }
-                    break;
+                } else if (command instanceof IncreaseDecreaseType) {
+                    if (IncreaseDecreaseType.INCREASE.equals(command)) {
+                        sendGetRequest("/win&A=~10");
+                    } else {
+                        sendGetRequest("/win&A=~-10");
+                    }
+                } else {
+                    masterBrightness = new BigDecimal(command.toString()).multiply(new BigDecimal(2.55));
+                    sendGetRequest("/win&A=" + masterBrightness);
+                }
+                break;
+            case CHANNEL_SOLID_COLOR:
+                // gets passed onto primaryColor, after exit any FX, full brightness on master.
+                sendGetRequest("/win&FX=0&A=255&TT=1");
+            case CHANNEL_PRIMARY_COLOR:
+                if (command instanceof OnOffType) {
+                    logger.info("OnOffType commands not supported unless you use masterBrightness channel");
+                    return;
+                } else if (command instanceof HSBType) {
+                    primaryColor = new HSBType(command.toString());
+                    sendGetRequest("/win&CL=" + createColorHex(primaryColor));
+                    return;
+                } else if (command instanceof IncreaseDecreaseType) {
+                    logger.info("IncreaseDecrease commands not supported unless you use the masterBrightness channel");
+                    return;
                 }
                 // this is here for when the command is Percentype and not HSBtype//
-                brightness = new BigDecimal(command.toString());
-                brightness = brightness.multiply(new BigDecimal(2.55));
-
-                // dtmp = (int) (dtmp * 2.55);
-                bridgeHandler.queueToSendMQTT(topic, "" + brightness.intValue());
+                primaryColor = new HSBType(
+                        primaryColor.getHue().toString() + "," + primaryColor.getSaturation().toString() + ",command");
+                sendGetRequest("/win&CL=" + createColorHex(primaryColor));
+                break;
+            case CHANNEL_SECONDARY_COLOR:
+                if (command instanceof OnOffType) {
+                    logger.info("OnOffType commands not supported unless you use masterBrightness channel");
+                    return;
+                } else if (command instanceof HSBType) {
+                    secondaryColor = new HSBType(command.toString());
+                    sendGetRequest("/win&C2=" + createColorHex(secondaryColor));
+                    return;
+                } else if (command instanceof IncreaseDecreaseType) {
+                    logger.info("IncreaseDecrease commands not supported unless you use the masterBrightness channel");
+                    return;
+                }
+                // this is here for when the command is Percentype and not HSBtype//
+                secondaryColor = new HSBType(secondaryColor.getHue().toString() + ","
+                        + secondaryColor.getSaturation().toString() + ",command");
+                sendGetRequest("/win&C2=" + createColorHex(secondaryColor));
                 break;
             case CHANNEL_PALETTES:
-                bridgeHandler.queueToSendMQTT(topic + "/api", "FP=" + command.toString());
+                sendGetRequest("/win&FP=" + command);
                 break;
             case CHANNEL_FX:
-                bridgeHandler.queueToSendMQTT(topic + "/api", "FX=" + command.toString());
+                sendGetRequest("/win&FX=" + command);
                 break;
             case CHANNEL_SPEED:
-                double dtmp = 0;
-                if ("OFF".equals(command.toString())) {
-                    dtmp = 0;
-                } else if ("ON".equals(command.toString())) {
-                    dtmp = 255;
+                BigDecimal bigTemp = new BigDecimal(command.toString());
+                if (OnOffType.OFF.equals(command)) {
+                    bigTemp = new BigDecimal(0);
+                } else if (OnOffType.ON.equals(command)) {
+                    bigTemp = new BigDecimal(255);
                 } else {
-                    dtmp = Double.parseDouble(command.toString());
-                    dtmp = (int) (dtmp * 2.55);
+                    bigTemp = new BigDecimal(command.toString()).multiply(new BigDecimal(2.55));
                 }
-                bridgeHandler.queueToSendMQTT(topic + "/api", "SX=" + dtmp);
+                sendGetRequest("/win&SX=" + bigTemp);
                 break;
             case CHANNEL_INTENSITY:
-                if ("OFF".equals(command.toString())) {
-                    dtmp = 0;
-                } else if ("ON".equals(command.toString())) {
-                    dtmp = 255;
+                if (OnOffType.OFF.equals(command)) {
+                    bigTemp = new BigDecimal(0);
+                } else if (OnOffType.ON.equals(command)) {
+                    bigTemp = new BigDecimal(255);
                 } else {
-                    dtmp = Double.parseDouble(command.toString());
-                    dtmp = (int) (dtmp * 2.55);
+                    bigTemp = new BigDecimal(command.toString()).multiply(new BigDecimal(2.55));
                 }
-                bridgeHandler.queueToSendMQTT(topic + "/api", "IX=" + dtmp);
+                sendGetRequest("/win&IX=" + bigTemp);
                 break;
             case CHANNEL_SLEEP:
-                if ("ON".equals(command.toString())) {
-                    bridgeHandler.queueToSendMQTT(topic + "/api", "ND");
+                if (OnOffType.ON.equals(command)) {
+                    sendGetRequest("/win&ND");
                 } else {
-                    bridgeHandler.queueToSendMQTT(topic + "/api", "NL=0");
+                    sendGetRequest("/win&NL=0");
                 }
                 break;
             case CHANNEL_PRESETS:
-                bridgeHandler.queueToSendMQTT(topic + "/api", "PL=" + command.toString());
-                break;
-            case CHANNEL_SAVE_PRESET:
-                bridgeHandler.queueToSendMQTT(topic + "/api", "PS=" + command.toString());
+                sendGetRequest("/win&PL=" + command);
                 break;
             case CHANNEL_PRESET_DURATION:
-                if ("OFF".equals(command.toString())) {
-                    dtmp = 0;
-                } else if ("ON".equals(command.toString())) {
-                    dtmp = 255;
+                if (OnOffType.OFF.equals(command)) {
+                    bigTemp = new BigDecimal(0);
+                } else if (OnOffType.ON.equals(command)) {
+                    bigTemp = new BigDecimal(255);
                 } else {
-                    dtmp = Double.parseDouble(command.toString());
-                    dtmp = (dtmp * 600) + 500; // scale from 0.5 seconds to 1 minute
+                    // scale from 0.5 seconds to 1 minute
+                    bigTemp = new BigDecimal(command.toString()).multiply(new BigDecimal(600)).add(new BigDecimal(500));
                 }
-                bridgeHandler.queueToSendMQTT(topic + "/api", "PT=" + dtmp);
+                sendGetRequest("/win&PT=" + bigTemp);
                 break;
             case CHANNEL_PRESET_TRANS_TIME:
-                if ("OFF".equals(command.toString())) {
-                    dtmp = 0;
-                } else if ("ON".equals(command.toString())) {
-                    dtmp = 255;
+                if (OnOffType.OFF.equals(command)) {
+                    bigTemp = new BigDecimal(0);
+                } else if (OnOffType.ON.equals(command)) {
+                    bigTemp = new BigDecimal(255);
                 } else {
-                    dtmp = Double.parseDouble(command.toString());
-                    dtmp = (dtmp * 600) + 500; // scale from 0.5 seconds to 1 minute
+                    // scale from 0.5 seconds to 1 minute
+                    bigTemp = new BigDecimal(command.toString()).multiply(new BigDecimal(600)).add(new BigDecimal(500));
                 }
-                bridgeHandler.queueToSendMQTT(topic + "/api", "TT=" + dtmp);
+                sendGetRequest("/win&TT=" + bigTemp);
                 break;
             case CHANNEL_PRESET_CYCLE:
-                if ("ON".equals(command.toString())) {
-                    bridgeHandler.queueToSendMQTT(topic + "/api", "CY=1");
+                if (OnOffType.ON.equals(command)) {
+                    sendGetRequest("/win&CY=1");
                 } else {
-                    bridgeHandler.queueToSendMQTT(topic + "/api", "CY=0");
+                    sendGetRequest("/win&CY=0");
                 }
                 break;
+        }
+    }
 
-        } // end switch
+    /**
+     * Needs to be called from an ACTION which is not yet implemented
+     *
+     */
+    public void savePreset(int presetIndex) {
+        sendGetRequest("/win&PS=" + presetIndex);
+    }
 
+    void pollLED() {
+        sendGetRequest("/win");
     }
 
     @Override
     public void initialize() {
-        if (getBridge() == null) {
-            logger.error("This globe {} does not have a bridge selected, please fix.", deviceID);
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING,
-                    "Globe must have a valid bridge selected to be able to come online, check you have a bridge selected.");
-        } else {
-            updateStatus(ThingStatus.ONLINE);
-            deviceID = this.getThing().getUID().getId();// eg 0x014
-            config = getThing().getConfiguration();
-            if (getBridge().getHandler() != null) {
-                bridgeHandler = (WLedBrokerHandler) getBridge().getHandler();
-            } else {
-                logger.error("bridgeHandler is null");
-                logger.error("This globe {} does not have a bridge selected, please fix.", deviceID);
-                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_PENDING,
-                        "Globe must have a valid bridge selected to be able to come online, check you have a bridge selected.");
+        config = getConfigAs(WLedConfiguration.class);
+        updateStatus(ThingStatus.ONLINE);
+        pollingFuture = threadPool.scheduleWithFixedDelay(this::pollLED, 1, config.pollTime, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void dispose() {
+        if (pollingFuture != null) {
+            pollingFuture.cancel(true);
+        }
+    }
+
+    /**
+     * @return A string that starts after finding the element and terminates when it finds the first < char after the
+     *         element.
+     */
+    static private String getValue(String message, String element) {
+        int startIndex = message.indexOf(element);
+        if (startIndex != -1) // It was found, as -1 means "not found"
+        {
+            int endIndex = message.indexOf('<', startIndex + element.length());
+            if (endIndex != -1)// , not found so make second check
+            {
+                return message.substring(startIndex + element.length(), endIndex);
             }
         }
+        return "";
     }
 }

@@ -10,11 +10,4 @@ https://www.eclipse.org/legal/epl-2.0/.
 
 == Source Code
 
-https://github.com/openhab/openhab2-addons
-
-== Third-party Content
-
-Paho
-* License: Eclipse Public License Version 1.0 ("EPL") and Eclipse Distribution License Version 1.0 ("EDL")
-* Project: https://www.eclipse.org/paho/
-* Source:  https://github.com/eclipse/paho.mqtt.java
+https://github.com/openhab/openhab-addons

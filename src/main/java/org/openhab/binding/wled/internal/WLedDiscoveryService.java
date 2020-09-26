@@ -15,17 +15,15 @@ package org.openhab.binding.wled.internal;
 
 import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
+import java.util.Set;
+
+import javax.jmdns.ServiceInfo;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
-import org.eclipse.smarthome.config.discovery.DiscoveryService;
+import org.eclipse.smarthome.config.discovery.mdns.MDNSDiscoveryParticipant;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
 import org.osgi.service.component.annotations.Component;
@@ -33,123 +31,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link WLedDiscoveryService} Discovers and adds to the inbox any Wled devices found.
+ * The {@link WLedDiscoveryService} Discovers and adds any Wled devices found.
  *
  * @author Matthew Skinner - Initial contribution
  */
-@Component(service = DiscoveryService.class, immediate = true, configurationPid = "binding.wled")
-public class WLedDiscoveryService extends AbstractDiscoveryService {
-
+@NonNullByDefault
+@Component(service = MDNSDiscoveryParticipant.class, immediate = true)
+public class WLedDiscoveryService implements MDNSDiscoveryParticipant {
     private final Logger logger = LoggerFactory.getLogger(WLedDiscoveryService.class);
 
-    public WLedDiscoveryService() {
-        super(WLedHandler.SUPPORTED_THING_TYPES, 5, true);
-    }
-
-    private void newThingFound(String deviceID) {
-        ThingTypeUID thingtypeuid = new ThingTypeUID(BINDING_ID, "wled");
-        ThingUID thingUID = new ThingUID(thingtypeuid, WLedBrokerHandler.confirmedBridgeUID, deviceID);
-        DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID)
-                .withBridge(WLedBrokerHandler.confirmedBridgeUID).withLabel("WLedString :" + deviceID).build();
-        thingDiscovered(discoveryResult);
-    }
-
-    private MqttClient client;
-
-    private void findThings() {
-
-        try {
-            client = new MqttClient(WLedBrokerHandler.confirmedAddress, MqttClient.generateClientId(),
-                    new MemoryPersistence());
-            MqttConnectOptions options = new MqttConnectOptions();
-
-            if (WLedBrokerHandler.confirmedUser != null && !WLedBrokerHandler.confirmedUser.contains("empty")) {
-                options.setUserName(WLedBrokerHandler.confirmedUser);
-            }
-
-            if (WLedBrokerHandler.confirmedPassword != null && !WLedBrokerHandler.confirmedPassword.equals("empty")) {
-                options.setPassword(WLedBrokerHandler.confirmedPassword.toCharArray());
-            }
-
-            client.setCallback(new MqttCallback() {
-                @Override
-                public void connectionLost(Throwable cause) {
-                }
-
-                @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-                    if (topic.contains("wled/")) {
-                        logger.debug("Discovery Service just recieved the following new wled controller:{}:{}", topic,
-                                message);
-
-                        String cutTopic = topic.replace("wled/", "");
-
-                        int index = cutTopic.indexOf("/");
-                        if (index != -1) // -1 means "not found"
-                        {
-                            String deviceID = (cutTopic.substring(0, index)); // Store the remote code for use later
-                            newThingFound(deviceID);
-                        }
-                    }
-                }
-
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken token) {
-                }
-            });
-
-            client.connect(options);
-            client.subscribe("wled/#", 1);
-
-        } catch (MqttException e) {
-            logger.error("Could not connect to MQTT broker to search for New Things. {}", e);
+    @Override
+    public @Nullable DiscoveryResult createResult(ServiceInfo service) {
+        String name = service.getName().toLowerCase();
+        if (!name.equals("wled")) {
+            return null;
         }
+        String address[] = service.getURLs();
+        if ((address == null) || address.length < 1) {
+            logger.debug("WLED discovered with empty IP address-{}", service);
+            return null;
+        }
+        logger.info("WLED discovered at {}", address[0]);
+        ThingTypeUID thingtypeuid = new ThingTypeUID("wled", "wled");
+        ThingUID thingUID = new ThingUID(thingtypeuid,
+                address[0].substring(7, address[0].length() - 3).replace(".", "-"));
+        return DiscoveryResultBuilder.create(thingUID).withProperty(CONFIG_ADDRESS, address[0])
+                .withLabel("WLED @" + address[0]).build();
     }
 
     @Override
-    protected void startScan() {
-        removeOlderResults(getTimestampOfLastScan());
-
-        if (WLedBrokerHandler.confirmedBridgeUID == null) {
-            logger.info(
-                    "No ONLINE WLed bridges were found. You need to add then edit a Bridge with your MQTT details before any of your globes can be found.");
-            ThingTypeUID thingtypeuid = THING_TYPE_BROKER;
-            ThingUID thingUID = new ThingUID(thingtypeuid, "Auto001");
-            DiscoveryResult discoveryResult = DiscoveryResultBuilder.create(thingUID).withLabel("WLed")
-                    .withThingType(THING_TYPE_BROKER).build();
-            thingDiscovered(discoveryResult);
-        }
-
-        else if (!"empty".equals(WLedBrokerHandler.confirmedAddress)) {
-            logger.info("WLedDiscoveryService is now looking for new things");
-            findThings();
-
-            try {
-                Thread.sleep(3000);
-                try {
-                    client.disconnect();
-                    deactivate();
-                } catch (MqttException e) {
-
-                }
-            } catch (InterruptedException e) {
-
-            }
-
-        } else {
-            logger.error(
-                    "ERROR: Can not scan if no Bridges are setup with valid MQTT broker details. Setup an WLed bridge then try again.");
-        }
+    public @Nullable ThingUID getThingUID(ServiceInfo service) {
+        return null;
     }
 
     @Override
-    protected void startBackgroundDiscovery() {
-
-    };
+    public Set<ThingTypeUID> getSupportedThingTypeUIDs() {
+        return SUPPORTED_THING_TYPES;
+    }
 
     @Override
-    protected void deactivate() {
-        super.deactivate();
+    public String getServiceType() {
+        return "_http._tcp.local.";
     }
 }

@@ -13,15 +13,20 @@
 
 package org.openhab.binding.wled.internal;
 
+import static org.openhab.binding.wled.internal.WLedBindingConstants.SUPPORTED_THING_TYPES;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.core.thing.Bridge;
+import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.eclipse.smarthome.io.net.http.HttpClientFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The {@link WLedHandlerFactory} is responsible for creating things and thing
@@ -32,22 +37,26 @@ import org.osgi.service.component.annotations.Component;
 @NonNullByDefault
 @Component(configurationPid = "binding.wled", service = ThingHandlerFactory.class)
 public class WLedHandlerFactory extends BaseThingHandlerFactory {
+    private HttpClient httpClient;
+
+    @Activate
+    public WLedHandlerFactory(@Reference HttpClientFactory httpClientFactory) {
+        this.httpClient = httpClientFactory.getCommonHttpClient();
+    }
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
-        return WLedBrokerHandler.SUPPORTED_THING_TYPES.contains(thingTypeUID)
-                | WLedHandler.SUPPORTED_THING_TYPES.contains(thingTypeUID);
+        if (SUPPORTED_THING_TYPES.contains(thingTypeUID)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
-
-        if (WLedBrokerHandler.SUPPORTED_THING_TYPES.contains(thingTypeUID)) {
-            return new WLedBrokerHandler((Bridge) thing);
-        }
-        if (WLedHandler.SUPPORTED_THING_TYPES.contains(thingTypeUID)) {
-            return new WLedHandler(thing);
+        if (SUPPORTED_THING_TYPES.contains(thingTypeUID)) {
+            return new WLedHandler(thing, httpClient);
         }
         return null;
     }

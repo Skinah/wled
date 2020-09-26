@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: org.openhab.binding.wled
-Bnd-LastModified: 1594040970297
+Bnd-LastModified: 1601103139399
 Bundle-Description: This project contains the official add-ons of open
  HAB
 Bundle-Developers: openhab;email="info@openhab.org";name=openHAB;organ
@@ -20,24 +20,26 @@ Bundle-SCM: url="https://github.com/openhab/openhab-addons/org.openhab
  tor.bundles/org.openhab.binding.wled",tag=HEAD
 Bundle-SymbolicName: org.openhab.binding.wled
 Bundle-Vendor: openHAB.org
-Bundle-Version: 2.5.4.202007061309
+Bundle-Version: 2.5.9.202009260652
 Created-By: 1.8.0_231 (Oracle Corporation)
-Import-Package: org.eclipse.smarthome.config.core,org.eclipse.smarthom
- e.config.discovery,org.eclipse.smarthome.core.library.types,org.eclip
- se.smarthome.core.thing,org.eclipse.smarthome.core.thing.binding,org.
- eclipse.smarthome.core.types,org.eclipse.paho.client.mqttv3;version="
- [1.2,2)",org.eclipse.paho.client.mqttv3.persist;version="[1.2,2)",org
- .slf4j;version="[1.7,2)"
-Private-Package: ESH-INF.binding,ESH-INF.i18n,ESH-INF.thing,org.openha
- b.binding.wled.internal
+Import-Package: org.eclipse.smarthome.config.discovery,org.eclipse.sma
+ rthome.config.discovery.mdns,org.eclipse.smarthome.core.library.types
+ ,org.eclipse.smarthome.core.thing,org.eclipse.smarthome.core.thing.bi
+ nding,org.eclipse.smarthome.core.types,org.eclipse.smarthome.io.net.h
+ ttp,javax.jmdns;version="[3.5,4)",org.eclipse.jetty.client;version="[
+ 9.3,10)",org.eclipse.jetty.client.api;version="[9.3,10)",org.eclipse.
+ jetty.http;version="[9.3,10)",org.slf4j;version="[1.7,2)"
+Private-Package: ESH-INF.binding,ESH-INF.thing,org.openhab.binding.wle
+ d.internal
 Provide-Capability: osgi.service;objectClass:List<String>="org.eclipse
- .smarthome.config.discovery.DiscoveryService";uses:="org.eclipse.smar
- thome.config.discovery",osgi.service;objectClass:List<String>="org.ec
- lipse.smarthome.core.thing.binding.ThingHandlerFactory";uses:="org.ec
- lipse.smarthome.core.thing.binding"
-Require-Capability: osgi.extender;filter:="(&(osgi.extender=osgi.compo
- nent)(version>=1.4.0)(!(version>=2.0.0)))",osgi.ee;filter:="(&(osgi.e
- e=JavaSE)(version=1.8))"
+ .smarthome.config.discovery.mdns.MDNSDiscoveryParticipant";uses:="org
+ .eclipse.smarthome.config.discovery.mdns",osgi.service;objectClass:Li
+ st<String>="org.eclipse.smarthome.core.thing.binding.ThingHandlerFact
+ ory";uses:="org.eclipse.smarthome.core.thing.binding"
+Require-Capability: osgi.service;filter:="(objectClass=org.eclipse.sma
+ rthome.io.net.http.HttpClientFactory)";effective:=active,osgi.extende
+ r;filter:="(&(osgi.extender=osgi.component)(version>=1.4.0)(!(version
+ >=2.0.0)))",osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Service-Component: OSGI-INF/org.openhab.binding.wled.internal.WLedDisc
  overyService.xml,OSGI-INF/org.openhab.binding.wled.internal.WLedHandl
  erFactory.xml

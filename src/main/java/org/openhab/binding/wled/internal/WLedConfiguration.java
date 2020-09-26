@@ -12,15 +12,15 @@
  */
 package org.openhab.binding.wled.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * The {@link WLedConfiguration} class contains fields mapping thing configuration parameters.
  *
  * @author Matthew Skinner - Initial contribution
  */
+@NonNullByDefault
 public class WLedConfiguration {
-
-    /**
-     * Sample configuration parameter. Replace with your own.
-     */
-    public String config1;
+    public String address = "";
+    public int pollTime;
 }

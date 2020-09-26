@@ -13,6 +13,10 @@
 
 package org.openhab.binding.wled.internal;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
 
@@ -28,25 +32,24 @@ public class WLedBindingConstants {
     public static final String BINDING_ID = "wled";
 
     // List of all Thing Type UIDs
-    public static final ThingTypeUID THING_TYPE_BROKER = new ThingTypeUID(BINDING_ID, "mqttBroker");
     public static final ThingTypeUID THING_TYPE_WLED = new ThingTypeUID(BINDING_ID, "wled");
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<ThingTypeUID>(
+            Arrays.asList(THING_TYPE_WLED));
 
-    // Broker config//
-    public static final String CONFIG_MQTT_ADDRESS = "ADDR";
-    public static final String CONFIG_MQTT_USER_NAME = "MQTT_USERNAME";
-    public static final String CONFIG_MQTT_PASSWORD = "MQTT_PASSWORD";
-    public static final String CONFIG_DELAY_BETWEEN_MQTT = "DELAY_BETWEEN_MQTT";
-    public static final String CONFIG_DELAY_BETWEEN_SAME_GLOBE = "DELAY_BETWEEN_SAME_GLOBE";
+    // config//
+    public static final String CONFIG_ADDRESS = "address";
+    public static final String CONFIG_POLL_TIME = "pollTime";
 
     // String channels
-    public static final String CHANNEL_COLOUR = "colour";
+    public static final String CHANNEL_MASTER_BRIGHTNESS = "masterBrightness";
+    public static final String CHANNEL_PRIMARY_COLOR = "primaryColor";
+    public static final String CHANNEL_SECONDARY_COLOR = "secondaryColor";
+    public static final String CHANNEL_SOLID_COLOR = "solidColor";
     public static final String CHANNEL_PALETTES = "palettes";
     public static final String CHANNEL_PRESETS = "presets";
-    public static final String CHANNEL_SAVE_PRESET = "savePreset";
     public static final String CHANNEL_PRESET_DURATION = "presetDuration";
     public static final String CHANNEL_PRESET_TRANS_TIME = "presetTransformTime";
     public static final String CHANNEL_PRESET_CYCLE = "presetCycle";
-
     public static final String CHANNEL_FX = "fx";
     public static final String CHANNEL_SPEED = "speed";
     public static final String CHANNEL_INTENSITY = "intensity";
