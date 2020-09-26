@@ -126,32 +126,6 @@ public class WLedHandler extends BaseThingHandler {
         updateState(CHANNEL_PRIMARY_COLOR, primaryColor);
         secondaryColor = parseToHSBType(message, "<cs>");
         updateState(CHANNEL_SECONDARY_COLOR, secondaryColor);
-        // updateState(CHANNEL_PRIMARY_COLOR, new HSBType(HSBType.fromRGB(r, g, b).getHue() + ","
-        // + HSBType.fromRGB(r, g, b).getSaturation() + "," + primaryBrightness));
-
-        // updateState(CHANNEL_COLOUR, HSBType.fromRGB(r, g, b));
-        /*
-         * case "c":
-         * int rgb = Integer.parseInt(message.substring(1), 16);
-         * int r = (rgb >>> 16) & 0xFF;
-         * int g = (rgb >>> 8) & 0xFF;
-         * int b = (rgb >>> 0) & 0xFF;
-         * updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR),
-         * new HSBType(HSBType.fromRGB(r, g, b).getHue() + "," + HSBType.fromRGB(r, g, b).getSaturation()
-         * + "," + brightness));
-         * // updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), HSBType.fromRGB(r, g, b));
-         * break;
-         * case "g":
-         * if (message.contentEquals("0")) {
-         * brightness = new BigDecimal(0);
-         * updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), OnOffType.OFF);
-         * } else {
-         * brightness = new BigDecimal(message);
-         * brightness = brightness.divide(new BigDecimal(2.55), RoundingMode.HALF_UP);
-         * updateState(new ChannelUID(channelPrefix + CHANNEL_COLOUR), new PercentType(brightness.intValue()));
-         * }
-         * break;
-         */
     }
 
     private void processState(String message) {
