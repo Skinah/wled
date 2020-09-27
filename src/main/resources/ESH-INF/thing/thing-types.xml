@@ -9,13 +9,14 @@
 		<description>A WLED string of LEDs</description>
 		<category>Lightbulb</category>
 		<channels>
-			<channel id="masterBrightness" typeId="masterBrightness"/>
+			<channel id="masterControls" typeId="masterControls"/>
 			<channel id="primaryColor" typeId="primaryColor"/>
+			<channel id="primaryWhite" typeId="primaryWhite"/>
 			<channel id="secondaryColor" typeId="secondaryColor"/>
-			<channel id="solidColor" typeId="solidColor"/>
+			<channel id="secondaryWhite" typeId="secondaryWhite"/>
 			<channel id="presets" typeId="presets"/>
 			<channel id="presetDuration" typeId="presetDuration"/>
-			<channel id="presetTransformTime" typeId="presetTransformTime"/>
+			<channel id="transformTime" typeId="transformTime"/>
 			<channel id="presetCycle" typeId="presetCycle"/>
 			<channel id="palettes" typeId="palettes"/>
 			<channel id="fx" typeId="fx"/>
@@ -37,11 +38,11 @@
 		</config-description>
 	</thing-type>
 
-	<channel-type id="masterBrightness">
-		<item-type>Dimmer</item-type>
-		<label>Master Brightness</label>
-		<description>Changes the brightness of all effects/presets.</description>
-		<category>DimmableLight</category>
+	<channel-type id="masterControls">
+		<item-type>Color</item-type>
+		<label>Master Controls</label>
+		<description>Allows you to exit FX mode and use the LEDS like a normal light.</description>
+		<category>ColorLight</category>
 		<tags>
 			<tag>Lighting</tag>
 		</tags>
@@ -50,28 +51,29 @@
 	<channel-type id="primaryColor">
 		<item-type>Color</item-type>
 		<label>Primary Color</label>
-		<description>Allows you to change the color of the globe.</description>
+		<description>Allows you to change the primary color used in FX.</description>
 		<category>ColorLight</category>
-		<tags>
-			<tag>Lighting</tag>
-		</tags>
+	</channel-type>
+
+	<channel-type id="primaryWhite">
+		<item-type>Dimmer</item-type>
+		<label>Primary White Brightness</label>
+		<description>Changes the brightness of the primary white LED.</description>
+		<category>DimmableLight</category>
 	</channel-type>
 
 	<channel-type id="secondaryColor">
 		<item-type>Color</item-type>
 		<label>Secondary Color</label>
-		<description>Allows you to change the color of the globe.</description>
+		<description>Allows you to change the secondary color used in FX.</description>
 		<category>ColorLight</category>
 	</channel-type>
 
-	<channel-type id="solidColor">
-		<item-type>Color</item-type>
-		<label>Solid Color</label>
-		<description>Allows you to exit any FX and set the LEDS to a single solid color.</description>
-		<category>ColorLight</category>
-		<tags>
-			<tag>Lighting</tag>
-		</tags>
+	<channel-type id="secondaryWhite">
+		<item-type>Dimmer</item-type>
+		<label>Secondary White Brightness</label>
+		<description>Changes the brightness of the white LED.</description>
+		<category>DimmableLight</category>
 	</channel-type>
 
 	<channel-type id="palettes">
@@ -286,12 +288,14 @@
 		<item-type>Dimmer</item-type>
 		<label>Preset Duration</label>
 		<description>Time before moving to the next preset.</description>
+		<category>Time</category>
 	</channel-type>
 
-	<channel-type id="presetTransformTime">
+	<channel-type id="transformTime">
 		<item-type>Dimmer</item-type>
 		<label>Preset Transform Time</label>
-		<description>Time it takes to change/fade from one preset to the next.</description>
+		<description>Time it takes to change/fade from one look to the next.</description>
+		<category>Time</category>
 	</channel-type>
 
 	<channel-type id="speed">
@@ -310,6 +314,7 @@
 		<item-type>Switch</item-type>
 		<label>sleep</label>
 		<description>Sleep mode: Lower the level of light and turn off after set time.</description>
+		<category>Time</category>
 	</channel-type>
 
 	<channel-type id="presetCycle">

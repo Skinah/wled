@@ -36,19 +36,18 @@ public class WLedBindingConstants {
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES = new HashSet<ThingTypeUID>(
             Arrays.asList(THING_TYPE_WLED));
 
-    // config//
+    // Configs
     public static final String CONFIG_ADDRESS = "address";
     public static final String CONFIG_POLL_TIME = "pollTime";
 
-    // String channels
-    public static final String CHANNEL_MASTER_BRIGHTNESS = "masterBrightness";
+    // Channels
+    public static final String CHANNEL_MASTER_CONTROLS = "masterControls";
     public static final String CHANNEL_PRIMARY_COLOR = "primaryColor";
     public static final String CHANNEL_SECONDARY_COLOR = "secondaryColor";
-    public static final String CHANNEL_SOLID_COLOR = "solidColor";
     public static final String CHANNEL_PALETTES = "palettes";
     public static final String CHANNEL_PRESETS = "presets";
     public static final String CHANNEL_PRESET_DURATION = "presetDuration";
-    public static final String CHANNEL_PRESET_TRANS_TIME = "presetTransformTime";
+    public static final String CHANNEL_TRANS_TIME = "transformTime";
     public static final String CHANNEL_PRESET_CYCLE = "presetCycle";
     public static final String CHANNEL_FX = "fx";
     public static final String CHANNEL_SPEED = "speed";

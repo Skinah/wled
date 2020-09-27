@@ -134,11 +134,11 @@ public class WLedHandler extends BaseThingHandler {
             updateStatus(ThingStatus.ONLINE);
         }
         if (message.contains("<ac>0</ac>")) {
-            updateState(CHANNEL_MASTER_BRIGHTNESS, OnOffType.OFF);
+            updateState(CHANNEL_MASTER_CONTROLS, OnOffType.OFF);
         } else {
             masterBrightness = new BigDecimal(getValue(message, "<ac>")).divide(new BigDecimal(2.55),
                     RoundingMode.HALF_UP);
-            updateState(CHANNEL_MASTER_BRIGHTNESS, new PercentType(masterBrightness));
+            updateState(CHANNEL_MASTER_CONTROLS, new PercentType(masterBrightness));
         }
         if (message.contains("<ix>0</ix>")) {
             updateState(CHANNEL_INTENSITY, OnOffType.OFF);
@@ -193,68 +193,76 @@ public class WLedHandler extends BaseThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
         if (command instanceof RefreshType) {
             switch (channelUID.getId()) {
-                case CHANNEL_PRIMARY_COLOR:
+                case CHANNEL_MASTER_CONTROLS:
                     sendGetRequest("/win");
             }
-            return;
+            return;// no need to check for refresh below
         }
         logger.debug("command {} sent to {}", command, channelUID.getId());
         switch (channelUID.getId()) {
-            case CHANNEL_MASTER_BRIGHTNESS:
+            case CHANNEL_MASTER_CONTROLS:
                 if (command instanceof OnOffType) {
                     if (OnOffType.OFF.equals(command)) {
-                        sendGetRequest("/win&T=0");
+                        sendGetRequest("/win&TT=500&T=0");
                     } else {
-                        sendGetRequest("/win&T=1");
+                        sendGetRequest("/win&TT=2000&T=1");
                     }
                 } else if (command instanceof IncreaseDecreaseType) {
                     if (IncreaseDecreaseType.INCREASE.equals(command)) {
-                        sendGetRequest("/win&A=~10");
+                        if (masterBrightness.intValue() < 240) {
+                            sendGetRequest("/win&TT=2000&A=~15"); // 255 divided by 15 = 17 levels
+                        } else {
+                            sendGetRequest("/win&TT=2000&A=255");
+                        }
                     } else {
-                        sendGetRequest("/win&A=~-10");
+                        if (masterBrightness.intValue() > 15) {
+                            sendGetRequest("/win&TT=2000&A=~-15");
+                        } else {
+                            sendGetRequest("/win&TT=2000&A=0");
+                        }
                     }
-                } else {
+                } else if (command instanceof HSBType) {
+                    if ((((HSBType) command).getBrightness()) == PercentType.ZERO) {
+                        sendGetRequest("/win&TT=500&T=0");
+                    }
+                    masterBrightness = new BigDecimal((((HSBType) command).getBrightness()).toString())
+                            .multiply(new BigDecimal(2.55));
+                    primaryColor = new HSBType(command.toString());
+                    sendGetRequest(
+                            "/win&TT=1000&FX=0&CY=0&CL=" + createColorHex(primaryColor) + "&A=" + masterBrightness);
+                } else {// should only be PercentType left
                     masterBrightness = new BigDecimal(command.toString()).multiply(new BigDecimal(2.55));
-                    sendGetRequest("/win&A=" + masterBrightness);
+                    sendGetRequest("/win&TT=2000&A=" + masterBrightness);
                 }
-                break;
-            case CHANNEL_SOLID_COLOR:
-                // gets passed onto primaryColor, after exit any FX, full brightness on master.
-                sendGetRequest("/win&FX=0&A=255&TT=1");
+                return;
             case CHANNEL_PRIMARY_COLOR:
                 if (command instanceof OnOffType) {
-                    logger.info("OnOffType commands not supported unless you use masterBrightness channel");
-                    return;
+                    logger.info("OnOffType commands should use masterControls channel");
                 } else if (command instanceof HSBType) {
                     primaryColor = new HSBType(command.toString());
                     sendGetRequest("/win&CL=" + createColorHex(primaryColor));
-                    return;
                 } else if (command instanceof IncreaseDecreaseType) {
-                    logger.info("IncreaseDecrease commands not supported unless you use the masterBrightness channel");
-                    return;
+                    logger.info("IncreaseDecrease commands should use masterControls channel");
+                } else {// Percentype
+                    primaryColor = new HSBType(primaryColor.getHue().toString() + ","
+                            + primaryColor.getSaturation().toString() + ",command");
+                    sendGetRequest("/win&CL=" + createColorHex(primaryColor));
                 }
-                // this is here for when the command is Percentype and not HSBtype//
-                primaryColor = new HSBType(
-                        primaryColor.getHue().toString() + "," + primaryColor.getSaturation().toString() + ",command");
-                sendGetRequest("/win&CL=" + createColorHex(primaryColor));
-                break;
+                return;
             case CHANNEL_SECONDARY_COLOR:
                 if (command instanceof OnOffType) {
-                    logger.info("OnOffType commands not supported unless you use masterBrightness channel");
-                    return;
+                    logger.info("OnOffType commands should use masterControls channel");
                 } else if (command instanceof HSBType) {
                     secondaryColor = new HSBType(command.toString());
                     sendGetRequest("/win&C2=" + createColorHex(secondaryColor));
-                    return;
                 } else if (command instanceof IncreaseDecreaseType) {
-                    logger.info("IncreaseDecrease commands not supported unless you use the masterBrightness channel");
-                    return;
+                    logger.info("IncreaseDecrease commands should use masterControls channel");
+                } else {// Percentype
+                    secondaryColor = new HSBType(secondaryColor.getHue().toString() + ","
+                            + secondaryColor.getSaturation().toString() + ",command");
+                    sendGetRequest("/win&C2=" + createColorHex(secondaryColor));
                 }
-                // this is here for when the command is Percentype and not HSBtype//
-                secondaryColor = new HSBType(secondaryColor.getHue().toString() + ","
-                        + secondaryColor.getSaturation().toString() + ",command");
-                sendGetRequest("/win&C2=" + createColorHex(secondaryColor));
-                break;
+                return;
             case CHANNEL_PALETTES:
                 sendGetRequest("/win&FP=" + command);
                 break;
@@ -303,7 +311,7 @@ public class WLedHandler extends BaseThingHandler {
                 }
                 sendGetRequest("/win&PT=" + bigTemp);
                 break;
-            case CHANNEL_PRESET_TRANS_TIME:
+            case CHANNEL_TRANS_TIME:
                 if (OnOffType.OFF.equals(command)) {
                     bigTemp = new BigDecimal(0);
                 } else if (OnOffType.ON.equals(command)) {
