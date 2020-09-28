@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: org.openhab.binding.wled
-Bnd-LastModified: 1601293549102
+Bnd-LastModified: 1601293630420
 Bundle-Description: This project contains the official add-ons of open
  HAB
 Bundle-Developers: openhab;email="info@openhab.org";name=openHAB;organ
@@ -20,7 +20,7 @@ Bundle-SCM: url="https://github.com/openhab/openhab-addons/org.openhab
  tor.bundles/org.openhab.binding.wled",tag=HEAD
 Bundle-SymbolicName: org.openhab.binding.wled
 Bundle-Vendor: openHAB.org
-Bundle-Version: 2.5.9.202009281145
+Bundle-Version: 2.5.9.202009281147
 Created-By: 1.8.0_231 (Oracle Corporation)
 Import-Package: org.eclipse.smarthome.config.discovery,org.eclipse.sma
  rthome.config.discovery.mdns,org.eclipse.smarthome.core.library.types

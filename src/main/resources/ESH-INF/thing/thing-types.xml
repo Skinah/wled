@@ -79,7 +79,7 @@
 	<channel-type id="palettes">
 		<item-type>String</item-type>
 		<label>palettes</label>
-		<description>Change the colours used by the FX.</description>		
+		<description>Change the colours used by the FX.</description>
 	</channel-type>
 
 	<channel-type id="fx">
@@ -93,25 +93,25 @@
 		<label>presets</label>
 		<description>Auto rotate or change to a saved preset.</description>
 		<state>
-            <options>
-                <option value="1">Preset 1</option>
-                <option value="2">Preset 2</option>
-                <option value="3">Preset 3</option>
-                <option value="4">Preset 4</option>
-                <option value="5">Preset 5</option>
-                <option value="6">Preset 6</option>
-                <option value="7">Preset 7</option>
-                <option value="8">Preset 8</option>
-                <option value="9">Preset 9</option>
-                <option value="10">Preset 10</option>
-                <option value="11">Preset 11</option>
-                <option value="12">Preset 12</option>
-                <option value="13">Preset 13</option>
-                <option value="14">Preset 14</option>
-                <option value="15">Preset 15</option>
-                <option value="16">Preset 16</option>
-            </options>
-        </state>
+			<options>
+				<option value="1">Preset 1</option>
+				<option value="2">Preset 2</option>
+				<option value="3">Preset 3</option>
+				<option value="4">Preset 4</option>
+				<option value="5">Preset 5</option>
+				<option value="6">Preset 6</option>
+				<option value="7">Preset 7</option>
+				<option value="8">Preset 8</option>
+				<option value="9">Preset 9</option>
+				<option value="10">Preset 10</option>
+				<option value="11">Preset 11</option>
+				<option value="12">Preset 12</option>
+				<option value="13">Preset 13</option>
+				<option value="14">Preset 14</option>
+				<option value="15">Preset 15</option>
+				<option value="16">Preset 16</option>
+			</options>
+		</state>
 	</channel-type>
 
 	<channel-type id="presetDuration">
