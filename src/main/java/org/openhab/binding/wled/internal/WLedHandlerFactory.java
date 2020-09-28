@@ -37,11 +37,14 @@ import org.osgi.service.component.annotations.Reference;
 @NonNullByDefault
 @Component(configurationPid = "binding.wled", service = ThingHandlerFactory.class)
 public class WLedHandlerFactory extends BaseThingHandlerFactory {
-    private HttpClient httpClient;
+    private final HttpClient httpClient;
+    private final WledDynamicStateDescriptionProvider stateDescriptionProvider;;
 
     @Activate
-    public WLedHandlerFactory(@Reference HttpClientFactory httpClientFactory) {
+    public WLedHandlerFactory(@Reference HttpClientFactory httpClientFactory,
+            final @Reference WledDynamicStateDescriptionProvider stateDescriptionProvider) {
         this.httpClient = httpClientFactory.getCommonHttpClient();
+        this.stateDescriptionProvider = stateDescriptionProvider;
     }
 
     @Override
@@ -56,7 +59,7 @@ public class WLedHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
         if (SUPPORTED_THING_TYPES.contains(thingTypeUID)) {
-            return new WLedHandler(thing, httpClient);
+            return new WLedHandler(thing, httpClient, stateDescriptionProvider);
         }
         return null;
     }

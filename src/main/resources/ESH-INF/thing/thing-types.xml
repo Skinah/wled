@@ -79,183 +79,13 @@
 	<channel-type id="palettes">
 		<item-type>String</item-type>
 		<label>palettes</label>
-		<description>Change the colours used by the FX.</description>
-		<state>
-			<options>
-				<option value="0">Default</option>
-				<option value="1">Random Cycle</option>
-				<option value="2">Primary color</option>
-				<option value="3">Based on primary</option>
-				<option value="4">Set colors</option>
-				<option value="5">Based on set</option>
-				<option value="6">Party</option>
-				<option value="7">Cloud</option>
-				<option value="8">Lava</option>
-				<option value="9">Ocean</option>
-				<option value="10">Forest</option>
-				<option value="11">Rainbow</option>
-				<option value="12">Rainbow bands</option>
-				<option value="13">Sunset</option>
-				<option value="14">Rivendell</option>
-				<option value="15">Breeze</option>
-				<option value="16">RedAndBlue</option>
-				<option value="17">Yellowout</option>
-				<option value="18">Analoguous</option>
-				<option value="19">Splash</option>
-				<option value="20">Pastel</option>
-				<option value="21">Sunset 2</option>
-				<option value="22">Beech</option>
-				<option value="23">Vintage</option>
-				<option value="24">Departure</option>
-				<option value="25">Landscape</option>
-				<option value="26">Beach</option>
-				<option value="27">Sherbet</option>
-				<option value="28">Hult</option>
-				<option value="29">Hult 64</option>
-				<option value="30">Drywet</option>
-				<option value="31">Jul</option>
-				<option value="32">Grintage</option>
-				<option value="33">Rewhi</option>
-				<option value="34">Tertiary</option>
-				<option value="35">Fire</option>
-				<option value="36">Icefire</option>
-				<option value="37">Cyane</option>
-				<option value="38">Light Pink</option>
-				<option value="39">Autumn</option>
-				<option value="40">Magenta</option>
-				<option value="41">Magred</option>
-				<option value="42">Yelmag</option>
-				<option value="43">Yelblu</option>
-				<option value="44">OrangeAndTeal</option>
-				<option value="45">Tiamat</option>
-				<option value="46">April Night</option>
-				<option value="47">Orangery</option>
-				<option value="48">C9</option>
-				<option value="49">Sakura</option>
-			</options>
-		</state>
+		<description>Change the colours used by the FX.</description>		
 	</channel-type>
 
 	<channel-type id="fx">
 		<item-type>String</item-type>
 		<label>Effect Index</label>
 		<description>Use the built in FX.</description>
-		<state>
-			<options>
-				<option value="0">0 Solid</option>
-				<option value="1">1 Blink</option>
-				<option value="2">2 Breathe</option>
-				<option value="3">3 Wipe</option>
-				<option value="4">4 WipeRandom</option>
-				<option value="5">5 RandomColors</option>
-				<option value="6">6 Sweep</option>
-				<option value="7">7 Dynamic</option>
-				<option value="8">8 Colorloop</option>
-				<option value="9">9 Rainbow</option>
-				<option value="10">10 Scan</option>
-				<option value="11">11 DualScan</option>
-				<option value="12">12 Fade</option>
-				<option value="13">13 Theater</option>
-				<option value="14">14 TheaterRainbow</option>
-				<option value="15">15 Running</option>
-				<option value="16">16 Saw</option>
-				<option value="17">17 Twinkle</option>
-				<option value="18">18 Dissolve</option>
-				<option value="19">19 DissolveRnd</option>
-				<option value="20">20 Sparkle</option>
-				<option value="21">21 SparkleDark</option>
-				<option value="22">22 Sparkle+</option>
-				<option value="23">23 Strobe</option>
-				<option value="24">24 StrobeRainbow</option>
-				<option value="25">25 StrobeMega</option>
-				<option value="26">26 BlinkRainbow</option>
-				<option value="27">27 Android</option>
-				<option value="28">28 Chase</option>
-				<option value="29">29 ChaseRandom</option>
-				<option value="30">30 ChaseRainbow</option>
-				<option value="31">31 ChaseFlash</option>
-				<option value="32">32 ChaseFlashRnd</option>
-				<option value="33">33 RainbowRunner</option>
-				<option value="34">34 Colorful</option>
-				<option value="35">35 TrafficLight</option>
-				<option value="36">36 SweepRandom</option>
-				<option value="37">37 Running2</option>
-				<option value="38">38 Red_and_Blue</option>
-				<option value="39">39 Stream</option>
-				<option value="40">40 Scanner</option>
-				<option value="41">41 Lighthouse</option>
-				<option value="42">42 Fireworks</option>
-				<option value="43">43 Rain</option>
-				<option value="44">44 MerryChristmas</option>
-				<option value="45">45 FireFlicker</option>
-				<option value="46">46 Gradient</option>
-				<option value="47">47 Loading</option>
-				<option value="48">48 Police</option>
-				<option value="49">49 PoliceAll</option>
-				<option value="50">50 Two Dots</option>
-				<option value="51">51 Two Areas</option>
-				<option value="52">52 Circus</option>
-				<option value="53">53 Halloween</option>
-				<option value="54">54 Tri Chase</option>
-				<option value="55">55 Tri Wipe</option>
-				<option value="56">56 Tri Fade</option>
-				<option value="57">57 Lightning</option>
-				<option value="58">58 ICU</option>
-				<option value="59">59 MultiComet</option>
-				<option value="60">60 Dual_Scanner</option>
-				<option value="61">61 Stream_2</option>
-				<option value="62">62 Oscillate</option>
-				<option value="63">63 Pride_2015</option>
-				<option value="64">64 Juggle</option>
-				<option value="65">65 Palette</option>
-				<option value="66">66 Fire_2012</option>
-				<option value="67">67 ColorWaves</option>
-				<option value="68">68 BPM</option>
-				<option value="69">69 FillNoise</option>
-				<option value="70">70 Noise1</option>
-				<option value="71">71 Noise2</option>
-				<option value="72">72 Noise3</option>
-				<option value="73">73 Noise4</option>
-				<option value="74">74 ColorTwinkles</option>
-				<option value="75">75 Lake</option>
-				<option value="76">76 Meteor</option>
-				<option value="77">77 SmoothMeteor</option>
-				<option value="78">78 Railway</option>
-				<option value="79">79 Ripple</option>
-				<option value="80">80 TwinkleFox</option>
-				<option value="81">81 TwinkleCat</option>
-				<option value="82">82 HalloweenEyes</option>
-				<option value="83">83 Solid Pattern</option>
-				<option value="84">84 Solid Pattern Tri</option>
-				<option value="85">85 Spots</option>
-				<option value="86">86 Spots Fade</option>
-				<option value="87">87 Glitter</option>
-				<option value="88">88 Candle</option>
-				<option value="89">89 Fireworks Starburst</option>
-				<option value="90">90 Fireworks 1D</option>
-				<option value="91">91 BouncingBalls</option>
-				<option value="92">92 Sinelon</option>
-				<option value="93">93 Sinelon_Dual</option>
-				<option value="94">94 Sinelon_Rainbow</option>
-				<option value="95">95 Popcorn</option>
-				<option value="96">96 Drip</option>
-				<option value="97">97 Plasma</option>
-				<option value="98">98 Percent</option>
-				<option value="99">99 RippleRainbow</option>
-				<option value="100">100 Heartbeat</option>
-				<option value="101">101 Pacifica</option>
-				<option value="102">102 Candle Multi</option>
-				<option value="103">103 Solid Glitter</option>
-				<option value="104">104 Sunrise</option>
-				<option value="105">105 Phased</option>
-				<option value="106">106 Twinkle Up</option>
-				<option value="107">107 Noise Pal</option>
-				<option value="108">108 Sinewave</option>
-				<option value="109">109 Phased Noise</option>
-				<option value="110">110 Flow</option>
-				<option value="111">111 Chunchun</option>
-			</options>
-		</state>
 	</channel-type>
 
 	<channel-type id="presets">
@@ -263,25 +93,25 @@
 		<label>presets</label>
 		<description>Auto rotate or change to a saved preset.</description>
 		<state>
-			<options>
-				<option value="1">Preset 1</option>
-				<option value="2">Preset 2</option>
-				<option value="3">Preset 3</option>
-				<option value="4">Preset 4</option>
-				<option value="5">Preset 5</option>
-				<option value="6">Preset 6</option>
-				<option value="7">Preset 7</option>
-				<option value="8">Preset 8</option>
-				<option value="9">Preset 9</option>
-				<option value="10">Preset 10</option>
-				<option value="11">Preset 11</option>
-				<option value="12">Preset 12</option>
-				<option value="13">Preset 13</option>
-				<option value="14">Preset 14</option>
-				<option value="15">Preset 15</option>
-				<option value="16">Preset 16</option>
-			</options>
-		</state>
+            <options>
+                <option value="1">Preset 1</option>
+                <option value="2">Preset 2</option>
+                <option value="3">Preset 3</option>
+                <option value="4">Preset 4</option>
+                <option value="5">Preset 5</option>
+                <option value="6">Preset 6</option>
+                <option value="7">Preset 7</option>
+                <option value="8">Preset 8</option>
+                <option value="9">Preset 9</option>
+                <option value="10">Preset 10</option>
+                <option value="11">Preset 11</option>
+                <option value="12">Preset 12</option>
+                <option value="13">Preset 13</option>
+                <option value="14">Preset 14</option>
+                <option value="15">Preset 15</option>
+                <option value="16">Preset 16</option>
+            </options>
+        </state>
 	</channel-type>
 
 	<channel-type id="presetDuration">

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.4.0" name="org.openhab.binding.wled.internal.WLedHandlerFactory" configuration-pid="binding.wled" init="1">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.4.0" name="org.openhab.binding.wled.internal.WLedHandlerFactory" configuration-pid="binding.wled" init="2">
   <service>
     <provide interface="org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory"/>
   </service>
   <reference name="$000" interface="org.eclipse.smarthome.io.net.http.HttpClientFactory" parameter="0"/>
+  <reference name="$001" interface="org.openhab.binding.wled.internal.WledDynamicStateDescriptionProvider" parameter="1"/>
   <implementation class="org.openhab.binding.wled.internal.WLedHandlerFactory"/>
 </scr:component>

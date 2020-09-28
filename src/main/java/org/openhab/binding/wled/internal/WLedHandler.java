@@ -16,6 +16,8 @@ import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,6 +44,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.eclipse.smarthome.core.types.StateOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,17 +59,21 @@ import org.slf4j.LoggerFactory;
 public class WLedHandler extends BaseThingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final HttpClient httpClient;
+    private final WledDynamicStateDescriptionProvider stateDescriptionProvider;
     private @Nullable ScheduledFuture<?> pollingFuture = null;
     private ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(1);
     private BigDecimal masterBrightness = new BigDecimal(0);
     private HSBType primaryColor = new HSBType();
+    private BigDecimal primaryWhite = new BigDecimal(0);
     private HSBType secondaryColor = new HSBType();
+    private BigDecimal secondaryWhite = new BigDecimal(0);
     private WLedConfiguration config;
-    private boolean hasWhite = false;
 
-    public WLedHandler(Thing thing, HttpClient httpClient) {
+    public WLedHandler(Thing thing, HttpClient httpClient,
+            WledDynamicStateDescriptionProvider stateDescriptionProvider) {
         super(thing);
         this.httpClient = httpClient;
+        this.stateDescriptionProvider = stateDescriptionProvider;
         config = getConfigAs(WLedConfiguration.class);
     }
 
@@ -103,21 +110,26 @@ public class WLedHandler extends BaseThingHandler {
             return new HSBType();
         }
         int endIndex = message.indexOf("<", startIndex + element.length());
-        int r = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
-        // look for second element
-        startIndex = message.indexOf(element, endIndex);
-        if (startIndex == -1) {
-            return new HSBType();
+        int r = 0, g = 0, b = 0;
+        try {
+            r = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
+            // look for second element
+            startIndex = message.indexOf(element, endIndex);
+            if (startIndex == -1) {
+                return new HSBType();
+            }
+            endIndex = message.indexOf("<", startIndex + element.length());
+            g = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
+            // look for third element called <cl>
+            startIndex = message.indexOf(element, endIndex);
+            if (startIndex == -1) {
+                return new HSBType();
+            }
+            endIndex = message.indexOf("<", startIndex + element.length());
+            b = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
+        } catch (NumberFormatException e) {
+            logger.warn("NumberFormatException when parsing the WLED color fields.");
         }
-        endIndex = message.indexOf("<", startIndex + element.length());
-        int g = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
-        // look for third element called <cl>
-        startIndex = message.indexOf(element, endIndex);
-        if (startIndex == -1) {
-            return new HSBType();
-        }
-        endIndex = message.indexOf("<", startIndex + element.length());
-        int b = Integer.parseInt(message.substring(startIndex + element.length(), endIndex));
         return HSBType.fromRGB(r, g, b);
     }
 
@@ -126,24 +138,56 @@ public class WLedHandler extends BaseThingHandler {
         updateState(CHANNEL_PRIMARY_COLOR, primaryColor);
         secondaryColor = parseToHSBType(message, "<cs>");
         updateState(CHANNEL_SECONDARY_COLOR, secondaryColor);
+        try {
+            primaryWhite = new BigDecimal(getValue(message, "<wv>", "<"));
+            if (primaryWhite.intValue() > -1) {
+                updateState(CHANNEL_PRIMARY_WHITE,
+                        new PercentType(primaryWhite.divide(new BigDecimal(2.55), RoundingMode.HALF_UP)));
+                secondaryWhite = new BigDecimal(getValue(message, "<ws>", "<"));
+                updateState(CHANNEL_SECONDARY_WHITE,
+                        new PercentType(secondaryWhite.divide(new BigDecimal(2.55), RoundingMode.HALF_UP)));
+            }
+        } catch (NumberFormatException e) {
+            logger.warn("NumberFormatException when parsing the WLED white fields.");
+        }
+    }
+
+    private void scrapeChannelOptions(String message) {
+        List<StateOption> fxOptions = new ArrayList<>();
+        List<StateOption> palleteOptions = new ArrayList<>();
+        int counter = 0;
+        for (String value : (getValue(message, "\"effects\":[", "]").replace("\"", "")).split(",")) {
+            fxOptions.add(new StateOption("" + counter++, value));
+        }
+        stateDescriptionProvider.setStateOptions(new ChannelUID(getThing().getUID(), CHANNEL_FX), fxOptions);
+        counter = 0;
+        for (String value : (getValue(message, "\"palettes\":[", "]").replace("\"", "")).split(",")) {
+            palleteOptions.add(new StateOption("" + counter++, value));
+        }
+        stateDescriptionProvider.setStateOptions(new ChannelUID(getThing().getUID(), CHANNEL_PALETTES), palleteOptions);
     }
 
     private void processState(String message) {
         logger.trace("WLED states are:{}", message);
         if (thing.getStatus() != ThingStatus.ONLINE) {
             updateStatus(ThingStatus.ONLINE);
+            sendGetRequest("/json"); // fetch FX and Pallete names
+        }
+        if (message.contains("\"effects\":[")) {// JSON API reply
+            scrapeChannelOptions(message);
+            return;
         }
         if (message.contains("<ac>0</ac>")) {
             updateState(CHANNEL_MASTER_CONTROLS, OnOffType.OFF);
         } else {
-            masterBrightness = new BigDecimal(getValue(message, "<ac>")).divide(new BigDecimal(2.55),
-                    RoundingMode.HALF_UP);
-            updateState(CHANNEL_MASTER_CONTROLS, new PercentType(masterBrightness));
+            masterBrightness = new BigDecimal(getValue(message, "<ac>", "<"));
+            updateState(CHANNEL_MASTER_CONTROLS,
+                    new PercentType(masterBrightness.divide(new BigDecimal(2.55), RoundingMode.HALF_UP)));
         }
         if (message.contains("<ix>0</ix>")) {
             updateState(CHANNEL_INTENSITY, OnOffType.OFF);
         } else {
-            BigDecimal bigTemp = new BigDecimal(getValue(message, "<ix>")).divide(new BigDecimal(2.55),
+            BigDecimal bigTemp = new BigDecimal(getValue(message, "<ix>", "<")).divide(new BigDecimal(2.55),
                     RoundingMode.HALF_UP);
             updateState(CHANNEL_INTENSITY, new PercentType(bigTemp));
         }
@@ -158,20 +202,15 @@ public class WLedHandler extends BaseThingHandler {
             updateState(CHANNEL_SLEEP, OnOffType.OFF);
         }
         if (message.contains("<fx>")) {
-            updateState(CHANNEL_FX, new StringType(getValue(message, "<fx>")));
+            updateState(CHANNEL_FX, new StringType(getValue(message, "<fx>", "<")));
         }
         if (message.contains("<sx>")) {
-            BigDecimal bigTemp = new BigDecimal(getValue(message, "<sx>")).divide(new BigDecimal(2.55),
+            BigDecimal bigTemp = new BigDecimal(getValue(message, "<sx>", "<")).divide(new BigDecimal(2.55),
                     RoundingMode.HALF_UP);
             updateState(CHANNEL_SPEED, new PercentType(bigTemp));
         }
         if (message.contains("<fp>")) {
-            updateState(CHANNEL_PALETTES, new StringType(getValue(message, "<fp>")));
-        }
-        if (message.contains("<wv>-1</wv>")) {
-            hasWhite = false;
-        } else {
-            hasWhite = true;
+            updateState(CHANNEL_PALETTES, new StringType(getValue(message, "<fp>", "<")));
         }
         parseColours(message);
     }
@@ -200,6 +239,16 @@ public class WLedHandler extends BaseThingHandler {
         }
         logger.debug("command {} sent to {}", command, channelUID.getId());
         switch (channelUID.getId()) {
+            case CHANNEL_PRIMARY_WHITE:
+                if (command instanceof PercentType) {
+                    sendGetRequest("/win&W=" + new BigDecimal(command.toString()).multiply(new BigDecimal(2.55)));
+                }
+                break;
+            case CHANNEL_SECONDARY_WHITE:
+                if (command instanceof PercentType) {
+                    sendGetRequest("/win&W2=" + new BigDecimal(command.toString()).multiply(new BigDecimal(2.55)));
+                }
+                break;
             case CHANNEL_MASTER_CONTROLS:
                 if (command instanceof OnOffType) {
                     if (OnOffType.OFF.equals(command)) {
@@ -358,14 +407,14 @@ public class WLedHandler extends BaseThingHandler {
     }
 
     /**
-     * @return A string that starts after finding the element and terminates when it finds the first < char after the
-     *         element.
+     * @return A string that starts after finding the element and terminates when it finds the first occurence of the
+     *         end char after the element.
      */
-    static private String getValue(String message, String element) {
+    static private String getValue(String message, String element, String end) {
         int startIndex = message.indexOf(element);
         if (startIndex != -1) // It was found, as -1 means "not found"
         {
-            int endIndex = message.indexOf('<', startIndex + element.length());
+            int endIndex = message.indexOf(end, startIndex + element.length());
             if (endIndex != -1)// , not found so make second check
             {
                 return message.substring(startIndex + element.length(), endIndex);
