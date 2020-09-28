@@ -30,7 +30,9 @@ The full example section gives everything needed to quickly setup using textual 
 |-|-|-|
 | `masterControls` | Color | Gives you control over the WLED like it is a normal light. Tag this control for Alexa or Google/Nest to change the lights instantly to any color, brightness or on/off state that you ask for regardless of what mode the light is in. |
 | `primaryColor` | Color | The primary color used in FX. |
+| `primaryWhite` | Dimmer | Ability to control the white channel if you have RGBW LEDs. |
 | `secondaryColor` | Color | The secondary color used in FX. |
+| `secondaryWhite` | Dimmer | Ability to control the white channel if you have RGBW LEDs. |
 | `palettes` | String | A list of palettes you can select from. |
 | `fx` | String |  A list of Effects you can select from. |
 | `speed` | Dimmer | Changes the speed of the loaded effect. |
