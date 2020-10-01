@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: org.openhab.binding.wled
-Bnd-LastModified: 1601294873574
+Bnd-LastModified: 1601535602378
 Bundle-Description: This project contains the official add-ons of open
  HAB
 Bundle-Developers: openhab;email="info@openhab.org";name=openHAB;organ
@@ -20,16 +20,17 @@ Bundle-SCM: url="https://github.com/openhab/openhab-addons/org.openhab
  tor.bundles/org.openhab.binding.wled",tag=HEAD
 Bundle-SymbolicName: org.openhab.binding.wled
 Bundle-Vendor: openHAB.org
-Bundle-Version: 2.5.9.202009281207
+Bundle-Version: 2.5.9.202010010700
 Created-By: 1.8.0_231 (Oracle Corporation)
-Import-Package: org.eclipse.smarthome.config.discovery,org.eclipse.sma
- rthome.config.discovery.mdns,org.eclipse.smarthome.core.library.types
- ,org.eclipse.smarthome.core.thing,org.eclipse.smarthome.core.thing.bi
- nding,org.eclipse.smarthome.core.thing.i18n,org.eclipse.smarthome.cor
- e.thing.type,org.eclipse.smarthome.core.types,org.eclipse.smarthome.i
- o.net.http,javax.jmdns;version="[3.5,4)",org.eclipse.jetty.client;ver
- sion="[9.3,10)",org.eclipse.jetty.client.api;version="[9.3,10)",org.e
- clipse.jetty.http;version="[9.3,10)",org.slf4j;version="[1.7,2)"
+Import-Package: org.openhab.core.automation.annotation;resolution:=opt
+ ional,org.eclipse.smarthome.config.discovery,org.eclipse.smarthome.co
+ nfig.discovery.mdns,org.eclipse.smarthome.core.library.types,org.ecli
+ pse.smarthome.core.thing,org.eclipse.smarthome.core.thing.binding,org
+ .eclipse.smarthome.core.thing.i18n,org.eclipse.smarthome.core.thing.t
+ ype,org.eclipse.smarthome.core.types,org.eclipse.smarthome.io.net.htt
+ p,javax.jmdns;version="[3.5,4)",org.eclipse.jetty.client;version="[9.
+ 3,10)",org.eclipse.jetty.client.api;version="[9.3,10)",org.eclipse.je
+ tty.http;version="[9.3,10)",org.slf4j;version="[1.7,2)"
 Private-Package: ESH-INF.binding,ESH-INF.thing,org.openhab.binding.wle
  d.internal
 Provide-Capability: osgi.service;objectClass:List<String>="org.eclipse

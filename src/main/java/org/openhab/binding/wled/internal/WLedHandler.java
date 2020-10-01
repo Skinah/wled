@@ -17,6 +17,8 @@ import static org.openhab.binding.wled.internal.WLedBindingConstants.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -42,6 +44,7 @@ import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
+import org.eclipse.smarthome.core.thing.binding.ThingHandlerService;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.StateOption;
@@ -277,8 +280,12 @@ public class WLedHandler extends BaseThingHandler {
                     masterBrightness = new BigDecimal((((HSBType) command).getBrightness()).toString())
                             .multiply(new BigDecimal(2.55));
                     primaryColor = new HSBType(command.toString());
-                    sendGetRequest(
-                            "/win&TT=1000&FX=0&CY=0&CL=" + createColorHex(primaryColor) + "&A=" + masterBrightness);
+                    if (primaryColor.getSaturation().intValue() < config.saturationThreshold) {
+                        sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=h000000&W=255" + "&A=" + masterBrightness);
+                    } else {
+                        sendGetRequest(
+                                "/win&TT=1000&FX=0&CY=0&CL=" + createColorHex(primaryColor) + "&A=" + masterBrightness);
+                    }
                 } else {// should only be PercentType left
                     masterBrightness = new BigDecimal(command.toString()).multiply(new BigDecimal(2.55));
                     sendGetRequest("/win&TT=2000&A=" + masterBrightness);
@@ -386,6 +393,10 @@ public class WLedHandler extends BaseThingHandler {
      *
      */
     public void savePreset(int presetIndex) {
+        if (presetIndex > 16) {
+            logger.warn("Presets above 16 do not exist, and the action sent {}", presetIndex);
+            return;
+        }
         sendGetRequest("/win&PS=" + presetIndex);
     }
 
@@ -404,6 +415,11 @@ public class WLedHandler extends BaseThingHandler {
         if (pollingFuture != null) {
             pollingFuture.cancel(true);
         }
+    }
+
+    @Override
+    public Collection<Class<? extends ThingHandlerService>> getServices() {
+        return Collections.singleton(WLedActions.class);
     }
 
     /**

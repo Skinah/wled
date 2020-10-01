@@ -23,4 +23,5 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 public class WLedConfiguration {
     public String address = "";
     public int pollTime;
+    public int saturationThreshold;
 }

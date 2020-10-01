@@ -1,9 +1,11 @@
-# WLed Binding
+# WLED Binding
 
 This openHAB binding allows you to auto discover and use LED strings from the WLED project found here:
 <https://github.com/Aircoookie/WLED>
 
-To watch what the binding does, enter this in to the openHAB console log:set TRACE org.openhab.binding.wled
+## Fault Finding
+
+To watch what the binding does you can enter this in to the openHAB console, `log:set TRACE org.openhab.binding.wled` which will allow you to test the same commands in a web browser to determine if it is a bug in the binding, or in the firmware for WLED.
 
 ## Supported Things
 
@@ -23,6 +25,7 @@ The full example section gives everything needed to quickly setup using textual 
 |-|-|
 | `address`| The URL to your WLED device. Example is `http://192.168.0.2:80` |
 | `pollTime`| How often you want the states of the LED fetched in case you make changes with a non openHAB app or web browser or the light is auto changing FX. |
+| `saturationThreshold` | Allows you to use a colorpicker linked to the masterControls channel to trigger the pure white LEDs when your using RGBW strings. Try setting the value to 12 or for RGB strings leave this on 0. TIP: set to 33 if you want Google devices to select the real white LEDS when you ask for white. |
 
 ## Channels
 
