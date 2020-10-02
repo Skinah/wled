@@ -1,11 +1,12 @@
 # WLED Binding
 
-This openHAB binding allows you to auto discover and use LED strings from the WLED project found here:
+This openHAB binding allows you to auto discover and use LED strings based on the WLED project:
 <https://github.com/Aircoookie/WLED>
 
 ## Fault Finding
 
 To watch what the binding does you can enter this in to the openHAB console, `log:set TRACE org.openhab.binding.wled` which will allow you to test the same commands in a web browser to determine if it is a bug in the binding, or in the firmware for WLED.
+Firmware 0.10.2 is working very well with this binding after extensive testing, so if an issue is found please report what firmware version you are using.
 
 ## Supported Things
 
@@ -17,31 +18,31 @@ To watch what the binding does you can enter this in to the openHAB console, `lo
 
 The auto discovery will work with this binding if your network supports mDNS.
 If it fails to find your WLED, you can manually add a `wled` thing by using the UI or textual methods.
-The full example section gives everything needed to quickly setup using textual config.
+The full example section below gives everything needed to quickly setup using textual config.
 
 ## Thing Configuration
 
 | Parameter | Description |
 |-|-|
-| `address`| The URL to your WLED device. Example is `http://192.168.0.2:80` |
-| `pollTime`| How often you want the states of the LED fetched in case you make changes with a non openHAB app or web browser or the light is auto changing FX. |
-| `saturationThreshold` | Allows you to use a colorpicker linked to the masterControls channel to trigger the pure white LEDs when your using RGBW strings. Try setting the value to 12 or for RGB strings leave this on 0. TIP: set to 33 if you want Google devices to select the real white LEDS when you ask for white. |
+| `address`| The full URL to your WLED device. Example is `http://192.168.0.2:80` |
+| `pollTime`| How often you want the states of the LED fetched in case you make changes with a non openHAB app, web browser, or the light is auto changing FX or presets. |
+| `saturationThreshold` | Allows you to use a colorpicker control linked to the `masterControls` channel to trigger only using the pure white LEDs when your using RGBW strings instead of creating fake white light from the RGB channels. Try setting the value to 12 or for RGB strings leave this on 0. TIP: set to 33 if you want Google devices to select the real white LEDS when you ask for white. |
 
 ## Channels
 
 | Channel | Type | Description |
 |-|-|-|
-| `masterControls` | Color | Gives you control over the WLED like it is a normal light. Tag this control for Alexa or Google/Nest to change the lights instantly to any color, brightness or on/off state that you ask for regardless of what mode the light is in. |
-| `primaryColor` | Color | The primary color used in FX. |
-| `primaryWhite` | Dimmer | Ability to control the white channel if you have RGBW LEDs. |
-| `secondaryColor` | Color | The secondary color used in FX. |
-| `secondaryWhite` | Dimmer | Ability to control the white channel if you have RGBW LEDs. |
-| `palettes` | String | A list of palettes you can select from. |
+| `masterControls` | Color | Gives you control over the WLED like it is any normal light. Tag this control for Alexa or Google/Nest to change the lights instantly to any colour, brightness or on/off state that you ask for regardless of what mode the light is in. |
+| `primaryColor` | Color | The primary colour used in FX. |
+| `primaryWhite` | Dimmer | The amount of white light used in the primary colour if you have RGBW LEDs. |
+| `secondaryColor` | Color | The secondary colour used in FX. |
+| `secondaryWhite` | Dimmer | The amount of white light used in the secondary colour if you have RGBW LEDs. |
+| `palettes` | String | A list of colour palettes you can select from that are used in the FX. |
 | `fx` | String |  A list of Effects you can select from. |
 | `speed` | Dimmer | Changes the speed of the loaded effect. |
 | `intensity` | Dimmer | Changes the intensity of the loaded effect. |
-| `presets` | String |  A list of presets you can select from.  |
-| `presetCycle` | Switch | Turns on automatic changing from one preset to the next. |
+| `presets` | String |  A list of presets that you can select from.  |
+| `presetCycle` | Switch | Turns ON/OFF the automatic changing from one preset to the next. |
 | `presetDuration` | Dimmer | How long it takes to change from one preset to the next with `presetCycle` turned ON. |
 | `transformTime` | Dimmer | How long it takes to transform/morph from one look to the next. |
 | `sleep` | Switch | Turns on the sleep timer. |
