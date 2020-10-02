@@ -70,6 +70,7 @@ public class WLedHandler extends BaseThingHandler {
     private BigDecimal primaryWhite = new BigDecimal(0);
     private HSBType secondaryColor = new HSBType();
     private BigDecimal secondaryWhite = new BigDecimal(0);
+    private boolean hasWhite = false;
     private WLedConfiguration config;
 
     public WLedHandler(Thing thing, HttpClient httpClient,
@@ -144,6 +145,7 @@ public class WLedHandler extends BaseThingHandler {
         try {
             primaryWhite = new BigDecimal(getValue(message, "<wv>", "<"));
             if (primaryWhite.intValue() > -1) {
+                hasWhite = true;
                 updateState(CHANNEL_PRIMARY_WHITE,
                         new PercentType(primaryWhite.divide(new BigDecimal(2.55), RoundingMode.HALF_UP)));
                 secondaryWhite = new BigDecimal(getValue(message, "<ws>", "<"));
@@ -151,7 +153,7 @@ public class WLedHandler extends BaseThingHandler {
                         new PercentType(secondaryWhite.divide(new BigDecimal(2.55), RoundingMode.HALF_UP)));
             }
         } catch (NumberFormatException e) {
-            logger.warn("NumberFormatException when parsing the WLED white fields.");
+            logger.warn("NumberFormatException when parsing the WLED colour and white fields.");
         }
     }
 
@@ -218,6 +220,14 @@ public class WLedHandler extends BaseThingHandler {
         parseColours(message);
     }
 
+    void sendWhite() {
+        if (hasWhite) {
+            sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=h000000&W=255" + "&A=" + masterBrightness);
+        } else {
+            sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=hFFFFFF" + "&A=" + masterBrightness);
+        }
+    }
+
     /**
      *
      * @param hsb
@@ -280,7 +290,11 @@ public class WLedHandler extends BaseThingHandler {
                     masterBrightness = new BigDecimal((((HSBType) command).getBrightness()).toString())
                             .multiply(new BigDecimal(2.55));
                     primaryColor = new HSBType(command.toString());
-                    if (primaryColor.getSaturation().intValue() < config.saturationThreshold) {
+                    if (primaryColor.getSaturation().intValue() < config.saturationThreshold && hasWhite) {
+                        sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=h000000&W=255" + "&A=" + masterBrightness);
+                    } else if (primaryColor.getSaturation().intValue() == 32 && primaryColor.getHue().intValue() == 36
+                            && hasWhite) {
+                        // Google sends this when it wants white
                         sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=h000000&W=255" + "&A=" + masterBrightness);
                     } else {
                         sendGetRequest(
@@ -386,6 +400,7 @@ public class WLedHandler extends BaseThingHandler {
                 }
                 break;
         }
+
     }
 
     /**

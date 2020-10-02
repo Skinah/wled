@@ -26,7 +26,7 @@ The full example section below gives everything needed to quickly setup using te
 |-|-|
 | `address`| The full URL to your WLED device. Example is `http://192.168.0.2:80` |
 | `pollTime`| How often you want the states of the LED fetched in case you make changes with a non openHAB app, web browser, or the light is auto changing FX or presets. |
-| `saturationThreshold` | Allows you to use a colorpicker control linked to the `masterControls` channel to trigger only using the pure white LEDs when your using RGBW strings instead of creating fake white light from the RGB channels. Try setting the value to 12 or for RGB strings leave this on 0. TIP: set to 33 if you want Google devices to select the real white LEDS when you ask for white. |
+| `saturationThreshold` | Allows you to use a colorpicker control linked to the `masterControls` channel to trigger only using the pure white LEDs when your using RGBW strings instead of creating fake white light from the RGB channels. Try setting the value to 12 or for RGB strings, leave this on 0. |
 
 ## Channels
 
