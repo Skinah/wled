@@ -400,7 +400,6 @@ public class WLedHandler extends BaseThingHandler {
                 }
                 break;
         }
-
     }
 
     /**
