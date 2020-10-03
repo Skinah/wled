@@ -402,10 +402,6 @@ public class WLedHandler extends BaseThingHandler {
         }
     }
 
-    /**
-     * Needs to be called from an ACTION which is not yet implemented
-     *
-     */
     public void savePreset(int presetIndex) {
         if (presetIndex > 16) {
             logger.warn("Presets above 16 do not exist, and the action sent {}", presetIndex);
