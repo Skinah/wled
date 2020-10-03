@@ -43,7 +43,7 @@ The full example section below gives everything needed to quickly setup using te
 | `intensity` | Dimmer | Changes the intensity of the loaded effect. |
 | `presets` | String |  A list of presets that you can select from.  |
 | `presetCycle` | Switch | Turns ON/OFF the automatic changing from one preset to the next. |
-| `presetDuration` | Dimmer | How long it takes to change from one preset to the next with `presetCycle` turned ON. |
+| `presetDuration` | Dimmer | How long it will display a preset for, before it begins to change from one preset to the next with `presetCycle` turned ON. |
 | `transformTime` | Dimmer | How long it takes to transform/morph from one look to the next. |
 | `sleep` | Switch | Turns on the sleep timer. |
 

@@ -47,7 +47,7 @@
 	<channel-type id="masterControls">
 		<item-type>Color</item-type>
 		<label>Master Controls</label>
-		<description>Allows you to exit FX mode and use the LEDS like a normal light.</description>
+		<description>Allows you to exit FX mode and use the LEDS like a normal light</description>
 		<category>ColorLight</category>
 		<tags>
 			<tag>Lighting</tag>
@@ -57,47 +57,47 @@
 	<channel-type id="primaryColor">
 		<item-type>Color</item-type>
 		<label>Primary Color</label>
-		<description>Allows you to change the primary color used in FX.</description>
+		<description>Allows you to change the primary color used in FX</description>
 		<category>ColorLight</category>
 	</channel-type>
 
 	<channel-type id="primaryWhite">
 		<item-type>Dimmer</item-type>
-		<label>Primary White Brightness</label>
-		<description>Changes the brightness of the primary white LED.</description>
+		<label>Primary White</label>
+		<description>Changes the brightness of the primary white LED</description>
 		<category>DimmableLight</category>
 	</channel-type>
 
 	<channel-type id="secondaryColor">
 		<item-type>Color</item-type>
 		<label>Secondary Color</label>
-		<description>Allows you to change the secondary color used in FX.</description>
+		<description>Allows you to change the secondary color used in FX</description>
 		<category>ColorLight</category>
 	</channel-type>
 
 	<channel-type id="secondaryWhite">
 		<item-type>Dimmer</item-type>
-		<label>Secondary White Brightness</label>
-		<description>Changes the brightness of the white LED.</description>
+		<label>Secondary White</label>
+		<description>Changes the brightness of the white LED</description>
 		<category>DimmableLight</category>
 	</channel-type>
 
 	<channel-type id="palettes">
 		<item-type>String</item-type>
-		<label>palettes</label>
-		<description>Change the colours used by the FX.</description>
+		<label>Palettes</label>
+		<description>Change the colours used by the FX</description>
 	</channel-type>
 
 	<channel-type id="fx">
 		<item-type>String</item-type>
-		<label>Effect Index</label>
-		<description>Use the built in FX.</description>
+		<label>Effect</label>
+		<description>Use the built in FX</description>
 	</channel-type>
 
 	<channel-type id="presets">
 		<item-type>String</item-type>
-		<label>presets</label>
-		<description>Auto rotate or change to a saved preset.</description>
+		<label>Presets</label>
+		<description>Auto rotate or change to a saved preset</description>
 		<state>
 			<options>
 				<option value="1">Preset 1</option>
@@ -123,13 +123,13 @@
 	<channel-type id="presetDuration">
 		<item-type>Dimmer</item-type>
 		<label>Preset Duration</label>
-		<description>Time before moving to the next preset.</description>
+		<description>Time to show each preset for before moving to the next</description>
 		<category>Time</category>
 	</channel-type>
 
 	<channel-type id="transformTime">
 		<item-type>Dimmer</item-type>
-		<label>Preset Transform Time</label>
+		<label>Transform Time</label>
 		<description>Time it takes to change/fade from one look to the next.</description>
 		<category>Time</category>
 	</channel-type>
@@ -137,26 +137,26 @@
 	<channel-type id="speed">
 		<item-type>Dimmer</item-type>
 		<label>FX Speed</label>
-		<description>Change the speed of the FX.</description>
+		<description>Change the speed of the FX</description>
 	</channel-type>
 
 	<channel-type id="intensity">
 		<item-type>Dimmer</item-type>
 		<label>FX Intensity</label>
-		<description>Change the intensity of the FX.</description>
+		<description>Change the intensity of the FX</description>
 	</channel-type>
 
 	<channel-type id="sleep">
 		<item-type>Switch</item-type>
-		<label>sleep</label>
-		<description>Sleep mode: Lower the level of light and turn off after set time.</description>
+		<label>Sleep Timer</label>
+		<description>Fade the level of light and turn off after set time</description>
 		<category>Time</category>
 	</channel-type>
 
 	<channel-type id="presetCycle">
 		<item-type>Switch</item-type>
-		<label>presetCycle</label>
-		<description>Cycle through the saved presets.</description>
+		<label>Preset Cycle</label>
+		<description>Cycle through the saved presets</description>
 	</channel-type>
 
 </thing:thing-descriptions>
