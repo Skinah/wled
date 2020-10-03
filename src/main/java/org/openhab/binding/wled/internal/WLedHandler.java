@@ -83,7 +83,7 @@ public class WLedHandler extends BaseThingHandler {
 
     void sendGetRequest(String url) {
         Request request = httpClient.newRequest(config.address + url);
-        request.timeout(10, TimeUnit.SECONDS);
+        request.timeout(3, TimeUnit.SECONDS);
         request.method(HttpMethod.GET);
         request.header(HttpHeader.ACCEPT_ENCODING, "gzip");
 
