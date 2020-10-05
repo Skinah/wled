@@ -222,7 +222,7 @@ public class WLedHandler extends BaseThingHandler {
 
     void sendWhite() {
         if (hasWhite) {
-            sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=h000000&W=255" + "&A=" + masterBrightness);
+            sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=hFF000000" + "&A=" + masterBrightness);
         } else {
             sendGetRequest("/win&TT=1000&FX=0&CY=0&CL=hFFFFFF" + "&A=" + masterBrightness);
         }
