@@ -86,7 +86,6 @@ public class WLedHandler extends BaseThingHandler {
         request.timeout(3, TimeUnit.SECONDS);
         request.method(HttpMethod.GET);
         request.header(HttpHeader.ACCEPT_ENCODING, "gzip");
-
         logger.debug("Sending WLED GET:{}", url);
         String errorReason = "";
         try {

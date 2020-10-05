@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Automatic-Module-Name: org.openhab.binding.wled
-Bnd-LastModified: 1601865070095
+Bnd-LastModified: 1601865879729
 Bundle-Description: This project contains the official add-ons of open
  HAB
 Bundle-Developers: openhab;email="info@openhab.org";name=openHAB;organ
@@ -20,25 +20,36 @@ Bundle-SCM: url="https://github.com/openhab/openhab-addons/org.openhab
  tor.bundles/org.openhab.binding.wled",tag=HEAD
 Bundle-SymbolicName: org.openhab.binding.wled
 Bundle-Vendor: openHAB.org
-Bundle-Version: 3.0.0.202010050231
+Bundle-Version: 3.0.0.202010050244
 Created-By: 11.0.8 (Azul Systems, Inc.)
 Import-Package: org.openhab.core.automation.annotation;resolution:=opt
- ional,org.openhab.core.io.net.http,org.openhab.core.library.types,org
- .openhab.core.thing,org.openhab.core.thing.binding,org.openhab.core.t
- ypes,org.eclipse.jetty.client;version="[9.3,10)",org.slf4j;version="[
- 1.7,2)"
+ ional,org.openhab.core.config.discovery,org.openhab.core.config.disco
+ very.mdns,org.openhab.core.io.net.http,org.openhab.core.library.types
+ ,org.openhab.core.thing,org.openhab.core.thing.binding,org.openhab.co
+ re.thing.i18n,org.openhab.core.thing.type,org.openhab.core.types,java
+ x.jmdns,org.eclipse.jetty.client,org.eclipse.jetty.client.api,org.ecl
+ ipse.jetty.http,org.slf4j
 Private-Package: OH-INF.binding,OH-INF.thing,org.openhab.binding.wled.
  internal
 Provide-Capability: osgi.service;objectClass:List<String>="org.openhab
- .core.thing.binding.ThingHandlerFactory";uses:="org.openhab.core.thin
- g.binding"
-Require-Capability: osgi.service;filter:="(objectClass=WledDynamicStat
- eDescriptionProvider)";effective:=active,osgi.service;filter:="(objec
- tClass=org.openhab.core.io.net.http.HttpClientFactory)";effective:=ac
- tive,osgi.extender;filter:="(&(osgi.extender=osgi.component)(version>
- =1.4.0)(!(version>=2.0.0)))",osgi.ee;filter:="(&(osgi.ee=JavaSE)(vers
- ion=11))"
-Service-Component: OSGI-INF/org.openhab.binding.wled.internal.WLedHand
- lerFactory.xml
+ .binding.wled.internal.WledDynamicStateDescriptionProvider,org.openha
+ b.core.thing.type.DynamicStateDescriptionProvider";uses:="org.openhab
+ .binding.wled.internal,org.openhab.core.thing.type",osgi.service;obje
+ ctClass:List<String>="org.openhab.core.config.discovery.mdns.MDNSDisc
+ overyParticipant";uses:="org.openhab.core.config.discovery.mdns",osgi
+ .service;objectClass:List<String>="org.openhab.core.thing.binding.Thi
+ ngHandlerFactory";uses:="org.openhab.core.thing.binding"
+Require-Capability: osgi.service;filter:="(objectClass=org.openhab.bin
+ ding.wled.internal.WledDynamicStateDescriptionProvider)";effective:=a
+ ctive,osgi.service;filter:="(objectClass=org.openhab.core.io.net.http
+ .HttpClientFactory)";effective:=active,osgi.service;filter:="(objectC
+ lass=org.openhab.core.thing.i18n.ChannelTypeI18nLocalizationService)"
+ ;effective:=active,osgi.extender;filter:="(&(osgi.extender=osgi.compo
+ nent)(version>=1.4.0)(!(version>=2.0.0)))",osgi.ee;filter:="(&(osgi.e
+ e=JavaSE)(version=11))"
+Service-Component: OSGI-INF/org.openhab.binding.wled.internal.WLedDisc
+ overyService.xml,OSGI-INF/org.openhab.binding.wled.internal.WLedHandl
+ erFactory.xml,OSGI-INF/org.openhab.binding.wled.internal.WledDynamicS
+ tateDescriptionProvider.xml
 Tool: Bnd-5.1.2.202007211702
 
